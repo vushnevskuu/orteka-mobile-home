@@ -359,7 +359,7 @@ function ProductCard({ product, onOpen, compact = false }) {
   );
 }
 
-function HomeScreen({ go, setSelectedProduct, setSearchValue, savedFilters, onApplySavedFilter }) {
+function HomeScreen({ go, setSelectedProduct, setSearchValue }) {
   const [selectedCustomer, setSelectedCustomer] = useState("Лёша");
   const [customerMenuOpen, setCustomerMenuOpen] = useState(false);
   const orderStatusToneClass = {
@@ -380,6 +380,8 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, savedFilters, onAp
     return 0;
   });
 
+  const isKatyaHome = selectedCustomer === "Катя";
+
   useEffect(() => {
     const slider = promoSliderRef.current;
     if (!slider) {
@@ -396,7 +398,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, savedFilters, onAp
   }, []);
 
   return (
-    <div className="h-full overflow-y-auto pb-20 bg-[#f7f8fa]">
+    <div className="h-full overflow-y-auto overflow-x-hidden pb-20 bg-[#f7f8fa]">
       <div className="px-4 pt-9 pb-4 space-y-4">
         <div className="flex items-center justify-between">
           <div className="relative">
@@ -446,19 +448,19 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, savedFilters, onAp
           </button>
         </div>
 
-        <section className="rounded-3xl bg-[linear-gradient(135deg,#ffab6a_0%,#ff8d3d_38%,#ff6e00_72%,#e75c00_100%)] p-4 text-white shadow-[0_6px_14px_rgba(255,110,0,0.18)] border border-[#ffb57a]/40">
-          <div className="flex items-center justify-between gap-3">
+        <section className="rounded-3xl bg-[linear-gradient(135deg,#ffab6a_0%,#ffa374_12%,#ff9c68_24%,#ff945c_36%,#ff8b50_48%,#ff8244_58%,#ff7836_68%,#ff6e28_78%,#f06418_88%,#e75c00_100%)] px-4 pt-4 pb-4 text-white shadow-[0_6px_14px_rgba(255,110,0,0.18)] border border-[#ffb57a]/40">
+          <div className="flex items-center justify-between gap-[6px]">
             <button type="button" onClick={() => go("salons")} className="flex min-w-0 items-center gap-2 text-left">
               <span className="truncate text-sm font-semibold">г. Москва, Тверская, 12</span>
               <ChevronRight size={18} className="shrink-0" />
             </button>
-            <button type="button" className="shrink-0 rounded-xl bg-white px-2 py-1 text-sm font-semibold text-[#ff6e00] flex items-center gap-1">
-              <span>1 240</span>
-              <img src={pointsLogo} alt="баллы" className="h-3 w-3" />
-            </button>
+            <div className="shrink-0 rounded-xl bg-white px-2 py-1 text-sm font-semibold text-[#ff6e00] flex items-center gap-1" aria-label="Баллы: 1 240">
+              <span aria-hidden>1 240</span>
+              <img src={pointsLogo} alt="" className="h-3 w-3" aria-hidden />
+            </div>
           </div>
 
-          <div className="mt-3">
+          <div className="mt-1.5">
             <SearchBar
               value=""
               onChange={(value) => {
@@ -469,38 +471,97 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, savedFilters, onAp
             />
           </div>
 
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => go("salons")}
-              className="h-16 rounded-xl border border-[#ffd3b0] bg-white px-3 text-left flex items-center justify-between gap-2 shadow-[0_3px_10px_rgba(0,0,0,0.08)]"
-            >
-              <div className="min-w-0">
-                <div className="text-xs font-semibold text-[#ff6e00] leading-4">Салон рядом</div>
-                <div className="mt-1 text-sm font-semibold text-[#1c1c1c] leading-4 truncate">Тверская · 1.2 км</div>
+          {isKatyaHome ? (
+            <>
+              {/* Катя: тот же ритм, что у сетки «Салон / Баллы» ниже — две плитки + детальная карточка */}
+              <div className="mt-1.5 space-y-[6px]">
+                <div className="grid grid-cols-2 gap-[6px] items-stretch">
+                  <button
+                    type="button"
+                    onClick={() => go("salons")}
+                    className="rounded-xl border border-[#ffd3b0] bg-white px-3 py-2.5 text-left shadow-[0_3px_10px_rgba(0,0,0,0.08)] cursor-pointer flex flex-col justify-center gap-0.5 min-h-16 active:bg-[#fff9f5] transition-colors duration-150"
+                  >
+                    <div className="text-xs font-semibold text-[#ff6e00] leading-4">Салон рядом</div>
+                    <div className="text-sm font-semibold text-[#1c1c1c] leading-4 truncate">Тверская · 1.2 км</div>
+                    <div className="text-xs text-neutral-500 leading-4 truncate">Открыто до 22:00</div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => go("order")}
+                    className="rounded-xl border border-[#ffd3b0] bg-white pl-3 pr-2 grid grid-cols-[1fr_40px] items-center gap-[6px] shadow-[0_3px_10px_rgba(0,0,0,0.08)] cursor-pointer min-h-16 active:bg-[#fff9f5] transition-colors duration-150"
+                  >
+                    <div className="min-w-0 text-left">
+                      <div className="text-xs font-semibold text-[#ff6e00] leading-4">QR заказа</div>
+                      <div className="mt-1 text-sm font-semibold leading-4 text-[#1c1c1c] truncate">Показать</div>
+                    </div>
+                    <div className="h-10 w-10 shrink-0 rounded-lg bg-white p-1 shadow-[0_2px_6px_rgba(0,0,0,0.12)]">
+                      <img src={homeQrImage} alt="QR код" className="h-full w-full rounded-[6px] object-cover" />
+                    </div>
+                  </button>
+                </div>
+
+                <div className="rounded-xl border border-[#ffd3b0] bg-white p-3 shadow-[0_3px_10px_rgba(0,0,0,0.08)]">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="min-w-0 pr-3 border-r border-[#f0e8e0]">
+                      <div className="text-xs font-semibold text-[#ff6e00] uppercase tracking-wide">К сгоранию</div>
+                      <p className="mt-1.5 text-sm text-neutral-700 leading-snug">
+                        <span className="font-semibold text-[#1c1c1c]">240</span> баллов до 30 июня
+                      </p>
+                    </div>
+                    <div className="min-w-0 pl-0.5">
+                      <div className="text-xs font-semibold text-[#ff6e00] uppercase tracking-wide">Статус</div>
+                      <div className="mt-1 text-sm font-bold text-[#1c1c1c] leading-tight">Серебряный</div>
+                      <p className="mt-2 text-xs text-neutral-600 leading-snug">
+                        До Золотого: <span className="font-semibold text-[#1c1c1c]">2 760</span> баллов
+                      </p>
+                      <div className="mt-2 h-1.5 w-full rounded-full bg-neutral-100 overflow-hidden">
+                        <div className="h-full w-[31%] rounded-full bg-gradient-to-r from-[#ff8d3d] to-[#ff6e00]" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <span className="inline-flex items-center rounded-full bg-[#eefafa] px-2.5 py-1 text-xs font-semibold text-[#009aa6]">
+                      спишем 5% от товара
+                    </span>
+                  </div>
+                </div>
               </div>
-              <ChevronRight size={16} className="shrink-0 text-[#ff6e00]" />
-            </button>
-            <button
-              type="button"
-              onClick={() => go("order")}
-              className="h-16 rounded-xl border border-[#ffd3b0] bg-white pl-3 pr-2 grid grid-cols-[1fr_40px] items-center gap-2 shadow-[0_3px_10px_rgba(0,0,0,0.08)]"
-            >
-              <div className="min-w-0 text-left">
-                <div className="text-xs font-semibold text-[#ff6e00] leading-4">Баллы</div>
-                <div className="mt-1 text-sm font-semibold leading-4 text-[#1c1c1c] truncate">240 сгорят 30 июня</div>
-              </div>
-              <div className="h-10 w-10 shrink-0 rounded-lg bg-white p-1 shadow-[0_2px_6px_rgba(0,0,0,0.12)]">
-                <img src={homeQrImage} alt="QR код" className="h-full w-full rounded-[6px] object-cover" />
-              </div>
-            </button>
-          </div>
+            </>
+          ) : (
+            <div className="mt-1.5 grid grid-cols-2 gap-[6px]">
+              <button
+                type="button"
+                onClick={() => go("salons")}
+                className="h-16 rounded-xl border border-[#ffd3b0] bg-white px-3 text-left flex items-center justify-between gap-[6px] shadow-[0_3px_10px_rgba(0,0,0,0.08)] cursor-pointer"
+              >
+                <div className="min-w-0">
+                  <div className="text-xs font-semibold text-[#ff6e00] leading-4">Салон рядом</div>
+                  <div className="mt-1 text-sm font-semibold text-[#1c1c1c] leading-4 truncate">Тверская · 1.2 км</div>
+                </div>
+                <ChevronRight size={16} className="shrink-0 text-[#ff6e00]" />
+              </button>
+              <button
+                type="button"
+                onClick={() => go("order")}
+                className="h-16 rounded-xl border border-[#ffd3b0] bg-white pl-3 pr-2 grid grid-cols-[1fr_40px] items-center gap-[6px] shadow-[0_3px_10px_rgba(0,0,0,0.08)] cursor-pointer"
+              >
+                <div className="min-w-0 text-left">
+                  <div className="text-xs font-semibold text-[#ff6e00] leading-4">Баллы</div>
+                  <div className="mt-1 text-sm font-semibold leading-4 text-[#1c1c1c] truncate">240 сгорят 30 июня</div>
+                </div>
+                <div className="h-10 w-10 shrink-0 rounded-lg bg-white p-1 shadow-[0_2px_6px_rgba(0,0,0,0.12)]">
+                  <img src={homeQrImage} alt="QR код" className="h-full w-full rounded-[6px] object-cover" />
+                </div>
+              </button>
+            </div>
+          )}
         </section>
 
-        <div className="flex snap-x snap-proximity gap-3 overflow-x-auto px-4 pb-2 scroll-px-4 overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none]">
+        <div className="-mx-4">
+          <div className="flex snap-x snap-proximity gap-3 overflow-x-auto pl-4 pr-4 pb-2 scroll-px-4 overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none]">
           {prioritizedOrderItems.map((item) => (
             <Card key={item.id} onClick={() => go("order")} className="!w-[296px] shrink-0 snap-start p-3 shadow-[0_3px_8px_rgba(0,0,0,0.04)]">
-              <div className="grid grid-cols-[88px_1fr] gap-3">
+              <div className="grid grid-cols-[88px_1fr] gap-[6px]">
                 <div className="h-[96px] rounded-xl border border-[#e0e2e7] bg-[#eef1f4] flex items-center justify-center">
                   <ShoppingBag size={20} className="text-neutral-300" />
                 </div>
@@ -514,21 +575,27 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, savedFilters, onAp
               </div>
             </Card>
           ))}
+          </div>
         </div>
 
-        <section className="-mx-4">
+        <section className="min-w-0 pb-4">
           <div
             ref={promoSliderRef}
-            className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 px-[38px] scroll-px-[38px] [scrollbar-width:none] [-ms-overflow-style:none]"
+            className="flex min-w-0 snap-x snap-proximity gap-3 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           >
             {promoCards.map((promo) => (
               <button
                 type="button"
                 key={promo.id}
                 onClick={() => go("catalog", { category: "all" })}
-                className="min-w-[300px] h-[133px] snap-start overflow-hidden rounded-2xl bg-[#dfe3e8]"
+                className="relative isolate block min-h-0 min-w-0 shrink-0 grow-0 basis-full snap-center overflow-hidden rounded-2xl bg-[#dfe3e8] aspect-[1024/498] cursor-pointer"
               >
-                <img src={promo.image} alt="" className="h-full w-full object-cover" />
+                <img
+                  src={promo.image}
+                  alt=""
+                  className="pointer-events-none absolute inset-0 size-full object-cover select-none"
+                  draggable={false}
+                />
                 <span className="sr-only">{promo.title}</span>
               </button>
             ))}
@@ -537,7 +604,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, savedFilters, onAp
 
         <section className="space-y-2">
           <h2 className={sectionTitleClass}>Симптомы</h2>
-          <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none]">
+          <div className="flex gap-2 overflow-x-auto pb-1 mr-[-16px] [scrollbar-width:none] [-ms-overflow-style:none]">
             {symptomTiles.map((item) => (
               <button
                 type="button"
@@ -554,11 +621,11 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, savedFilters, onAp
           </div>
         </section>
 
-        <section className="-mx-4">
+        <section>
           <div className="px-4 mb-2 flex items-center justify-between">
             <h2 className={sectionTitleClass}>Услуги</h2>
           </div>
-          <div className="flex snap-x snap-proximity gap-3 overflow-x-auto px-4 pb-2 scroll-px-4 [scrollbar-width:none] [-ms-overflow-style:none]">
+          <div className="flex snap-x snap-proximity gap-3 overflow-x-auto pl-0 pr-0 pb-2 -mr-4 scroll-px-4 [scrollbar-width:none] [-ms-overflow-style:none]">
             <button
               type="button"
               onClick={() => go("salons")}
@@ -707,7 +774,7 @@ function CatalogScreen({ go, selectedCategory, setSelectedCategory, searchValue,
       <div className="px-5 space-y-4">
         <SearchBar value={searchValue} onChange={setSearchValue} />
 
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-5 px-5">
+        <div className="-mx-5 flex gap-2 overflow-x-auto pb-1 px-5">
           {categories.map((category) => (
             <button
               type="button"
@@ -900,7 +967,7 @@ function ProductScreen({ product, go, cartCount, setCartCount }) {
               Помочь подобрать
             </button>
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          <div className="-mx-5 flex gap-2 overflow-x-auto pb-1 px-5">
             {product.sizes.map((size) => (
               <button
                 type="button"
@@ -1482,18 +1549,7 @@ export default function OrtekaMobilePrototype() {
     if (typeof options.onlyNearby === "boolean") {
       setCatalogOnlyNearby(options.onlyNearby);
     }
-    if (nextScreen !== "home") {
-      return;
-    }
     setScreen(nextScreen);
-  };
-
-  const applySavedFilter = (filter) => {
-    setSearchValue(filter.query || "");
-    go("catalog", {
-      category: filter.category || "all",
-      onlyNearby: Boolean(filter.onlyNearby),
-    });
   };
 
   const saveFilter = ({ category, query, onlyNearby }) => {
@@ -1544,8 +1600,6 @@ export default function OrtekaMobilePrototype() {
               go={go}
               setSelectedProduct={setSelectedProduct}
               setSearchValue={setSearchValue}
-              savedFilters={savedFilters}
-              onApplySavedFilter={applySavedFilter}
             />
           )}
 
