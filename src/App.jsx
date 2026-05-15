@@ -312,8 +312,8 @@ const defaultSavedFilters = [
 const homeProfileCustomers = [
   { name: "Катя", disabled: false },
   { name: "Жильвинас", disabled: false },
-  { name: "В разработке", disabled: false },
-  { name: "Лёша", disabled: false },
+  { name: "В разработке", disabled: true },
+  { name: "Лёша", disabled: true },
 ];
 
 const katyaStyleHomeProfiles = new Set(["Катя", "В разработке"]);
@@ -616,27 +616,23 @@ function BottomNav({ screen, go, homeProfileCustomer, setHomeProfileCustomer }) 
           role="menu"
         >
           <div className="px-2 py-1.5 text-[11px] font-medium text-neutral-500">Профиль демо</div>
-          {homeProfileCustomers.map((customer) => (
+          {homeProfileCustomers
+            .filter((customer) => !customer.disabled)
+            .map((customer) => (
             <button
               type="button"
               key={customer.name}
               role="menuitem"
-              disabled={customer.disabled}
               onClick={() => {
-                if (customer.disabled) {
-                  return;
-                }
                 setHomeProfileCustomer(customer.name);
                 setHomeProfilePickerOpen(false);
               }}
               className={cx(
                 "flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm",
-                customer.name === homeProfileCustomer ? "bg-[#f4f5f7] font-semibold text-[#1c1c1c]" : "text-neutral-700",
-                customer.disabled && "cursor-not-allowed text-neutral-300"
+                customer.name === homeProfileCustomer ? "bg-[#f4f5f7] font-semibold text-[#1c1c1c]" : "text-neutral-700"
               )}
             >
               <span>{customer.name}</span>
-              {customer.disabled && <span className="text-[11px] font-medium">позже</span>}
             </button>
           ))}
         </div>
@@ -930,27 +926,23 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
               </button>
               {customerMenuOpen && (
                 <div className="absolute left-0 top-7 z-50 w-40 overflow-hidden rounded-2xl border border-[#e0e2e7] bg-white p-1 shadow-[0_12px_28px_rgba(0,0,0,0.14)]" role="menu">
-                  {homeProfileCustomers.map((customer) => (
+                  {homeProfileCustomers
+                    .filter((customer) => !customer.disabled)
+                    .map((customer) => (
                     <button
                       type="button"
                       key={customer.name}
                       role="menuitem"
-                      disabled={customer.disabled}
                       onClick={() => {
-                        if (customer.disabled) {
-                          return;
-                        }
                         setHomeProfileCustomer(customer.name);
                         setCustomerMenuOpen(false);
                       }}
                       className={cx(
                         "flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm",
-                        customer.name === homeProfileCustomer ? "bg-[#f4f5f7] font-semibold text-[#1c1c1c]" : "text-neutral-700",
-                        customer.disabled && "cursor-not-allowed text-neutral-300"
+                        customer.name === homeProfileCustomer ? "bg-[#f4f5f7] font-semibold text-[#1c1c1c]" : "text-neutral-700"
                       )}
                     >
                       <span>{customer.name}</span>
-                      {customer.disabled && <span className={cx(homeText11, "font-medium")}>позже</span>}
                     </button>
                   ))}
                 </div>
@@ -2372,6 +2364,14 @@ function OrderScreen({ go }) {
 export default function OrtekaMobilePrototype() {
   const [screen, setScreen] = useState("home");
   const [homeProfileCustomer, setHomeProfileCustomer] = useState("Катя");
+
+  useEffect(() => {
+    const currentProfile = homeProfileCustomers.find((customer) => customer.name === homeProfileCustomer);
+    if (currentProfile?.disabled) {
+      setHomeProfileCustomer("Катя");
+    }
+  }, [homeProfileCustomer]);
+
   const [selectedProduct, setSelectedProduct] = useState(products[0]);
   const [searchValue, setSearchValue] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
