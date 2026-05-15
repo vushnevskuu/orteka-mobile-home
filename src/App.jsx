@@ -1541,7 +1541,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                     >
                       <div className={cx(homeEyebrow11, "whitespace-nowrap text-[#ff6e00]")}>К сгоранию</div>
                       <p className="mt-0.5 whitespace-nowrap text-xs text-neutral-700 leading-snug">
-                        <span className="font-semibold text-[#1c1c1c]">240</span> баллов до 30 июня
+                        <span className="font-semibold text-[#1c1c1c]">240</span> бонусов до 30 июня
                       </p>
                       <span
                         className={cx(
