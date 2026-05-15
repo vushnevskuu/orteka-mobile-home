@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  BadgePercent,
+  Bandage,
   Bell,
+  Bone,
   Camera,
   Check,
   ChevronLeft,
@@ -21,7 +24,9 @@ import {
   ShoppingBag,
   SlidersHorizontal,
   Sparkles,
+  SportShoe,
   Star,
+  Stethoscope,
   User,
   X,
 } from "lucide-react";
@@ -36,6 +41,7 @@ import tabCatalogFigmaIcon from "./assets/tab-catalog-figma.svg";
 import tabFavFigmaIcon from "./assets/tab-fav-figma.svg";
 import tabHomeFigmaIcon from "./assets/tab-home-figma.svg";
 import tabProfileFigmaIcon from "./assets/tab-profile-figma.svg";
+import tabServicesFigmaIcon from "./assets/tab-services-figma.svg";
 
 const categories = [
   { id: "all", title: "Все", subtitle: "все товары", icon: Grid2X2 },
@@ -102,7 +108,93 @@ const products = [
     availability: "Можно примерить в ближайшем салоне",
     imageLabel: "Обувь",
   },
+  {
+    id: 5,
+    category: "braces",
+    title: "Бандаж на голеностопный сустав",
+    price: "2 190 ₽",
+    oldPrice: null,
+    badge: "Есть рядом",
+    rating: "4.7",
+    sizes: ["S", "M", "L", "XL"],
+    fit: "Фиксация и поддержка при растяжении",
+    reason: "Подходит для активной ходьбы",
+    availability: "В салоне на Тверской — сегодня",
+    imageLabel: "Бандаж",
+  },
+  {
+    id: 6,
+    category: "compression",
+    title: "Гольфы компрессионные 1 класс",
+    price: "2 890 ₽",
+    oldPrice: "3 490 ₽",
+    badge: "Нужен замер",
+    rating: "4.6",
+    sizes: ["S", "M", "L", "XL"],
+    fit: "Для профилактики варикоза и усталости ног",
+    reason: "Часто берут в пару к чулкам",
+    availability: "В 3 салонах рядом",
+    imageLabel: "Гольфы",
+  },
+  {
+    id: 7,
+    category: "insoles",
+    title: "Стельки-супинаторы ORTO Active",
+    price: "3 290 ₽",
+    oldPrice: null,
+    badge: "Популярно",
+    rating: "4.8",
+    sizes: ["38", "39", "40", "41", "42", "43"],
+    fit: "Усиленная поддержка свода стопы",
+    reason: "Рекомендуют после диагностики",
+    availability: "Доставка завтра",
+    imageLabel: "Стельки",
+  },
+  {
+    id: 8,
+    category: "shoes",
+    title: "Туфли ортопедические закрытые",
+    price: "8 490 ₽",
+    oldPrice: "9 990 ₽",
+    badge: "Примерка",
+    rating: "4.8",
+    sizes: ["37", "38", "39", "40", "41", "42"],
+    fit: "Для офиса и длительной ходьбы",
+    reason: "Есть модель в вашем размере",
+    availability: "Можно примерить в ближайшем салоне",
+    imageLabel: "Обувь",
+  },
+  {
+    id: 9,
+    category: "braces",
+    title: "Наколенник с шарнирами",
+    price: "4 590 ₽",
+    oldPrice: null,
+    badge: "Есть рядом",
+    rating: "4.7",
+    sizes: ["S", "M", "L", "XL"],
+    fit: "Стабилизация колена при нагрузке",
+    reason: "Вы смотрели товары для колена",
+    availability: "В салоне на Арбате — сегодня",
+    imageLabel: "Наколенник",
+  },
+  {
+    id: 10,
+    category: "compression",
+    title: "Чулки компрессионные до бедра",
+    price: "5 490 ₽",
+    oldPrice: null,
+    badge: "Нужен замер",
+    rating: "4.9",
+    sizes: ["S", "M", "L", "XL"],
+    fit: "Равномерная компрессия по всей ноге",
+    reason: "Подбор по индивидуальным меркам",
+    availability: "В 4 салонах рядом",
+    imageLabel: "Чулки",
+  },
 ];
+
+const homeFeaturedProducts = products.slice(0, 10);
 
 const salons = [
   {
@@ -123,14 +215,17 @@ const salons = [
   },
 ];
 
-const homeCategories = [
-  { id: "promo", title: "Акции", subtitle: "выгода рядом", category: "all" },
-  { id: "insoles", title: "Стельки", subtitle: "стопа и обувь", category: "insoles" },
-  { id: "braces", title: "Бандажи", subtitle: "поддержка суставов", category: "braces" },
-  { id: "orthoses", title: "Ортезы", subtitle: "фиксация и восстановление", category: "braces" },
-  { id: "shoes", title: "Обувь", subtitle: "примерка в салоне", category: "shoes" },
-  { id: "compression", title: "Трикотаж", subtitle: "нужен точный размер", category: "compression" },
+const katyaHomeQuickTiles = [
+  { id: "symptoms", title: "Симптомы", category: "all", icon: Stethoscope },
+  { id: "promo", title: "Акции", category: "all", icon: BadgePercent },
+  { id: "insoles", title: "Стельки", category: "insoles", icon: Footprints },
+  { id: "braces", title: "Бандажи", category: "braces", icon: Bandage },
+  { id: "orthoses", title: "Ортезы", category: "braces", icon: Bone },
+  { id: "shoes", title: "Обувь", category: "shoes", icon: SportShoe },
+  { id: "compression", title: "Трикотаж", category: "compression", icon: ShieldCheck },
 ];
+
+const homeCategories = katyaHomeQuickTiles.filter((tile) => tile.id !== "symptoms");
 
 const symptomTiles = [
   { id: "back-pain", label: "Болит спина", category: "braces", query: "спина" },
@@ -277,6 +372,7 @@ function BottomNav({ screen, go, homeProfileCustomer, setHomeProfileCustomer }) 
   const items = [
     { id: "home", title: "Главная", image: tabHomeFigmaIcon, width: 34, height: 24, action: () => go("home") },
     { id: "catalog", title: "Каталог", image: tabCatalogFigmaIcon, width: 24, height: 24, action: () => go("catalog", { category: "all" }) },
+    { id: "services", title: "Услуги", image: tabServicesFigmaIcon, width: 24, height: 24, action: () => go("services") },
     { id: "cart", title: "Корзина", image: tabCartFigmaIcon, width: 24, height: 24, action: () => go("cart") },
     { id: "favorites", title: "Избранное", image: tabFavFigmaIcon, width: 24, height: 24, action: () => go("favorites") },
     { id: "profile", title: "Профиль", image: tabProfileFigmaIcon, width: 24, height: 24, action: () => go("profile") },
@@ -515,8 +611,8 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
     <div className="h-full overflow-y-auto overflow-x-hidden pb-20 bg-[#f7f8fa]">
       <div
         className={cx(
-          "px-4 pb-4 space-y-4",
-          isKatyaHome ? "pt-2" : "pt-4"
+          "px-4 pb-4 flex flex-col gap-4",
+          isKatyaHome ? "pt-0" : "pt-4"
         )}
       >
         {!isKatyaHome && (
@@ -569,7 +665,14 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
           </div>
         )}
 
-        <section className="rounded-3xl bg-[linear-gradient(135deg,#ffab6a_0%,#ffa374_12%,#ff9c68_24%,#ff945c_36%,#ff8b50_48%,#ff8244_58%,#ff7836_68%,#ff6e28_78%,#f06418_88%,#e75c00_100%)] p-4 text-white shadow-[0_6px_14px_rgba(255,110,0,0.18)] border border-[#ffb57a]/40">
+        <section
+          className={cx(
+            "-mx-4 border-x-0 bg-[linear-gradient(135deg,#ffab6a_0%,#ffa374_12%,#ff9c68_24%,#ff945c_36%,#ff8b50_48%,#ff8244_58%,#ff7836_68%,#ff6e28_78%,#f06418_88%,#e75c00_100%)] px-4 pb-4 text-white shadow-[0_6px_14px_rgba(255,110,0,0.18)] border-b border-[#ffb57a]/40",
+            isKatyaHome
+              ? "pt-[max(2rem,env(safe-area-inset-top,0px))] rounded-b-3xl border-t-0"
+              : "rounded-3xl border-t border-[#ffb57a]/40 pt-4"
+          )}
+        >
           {isKatyaHome ? (
             <div className="flex items-center gap-1.5">
               <button
@@ -592,20 +695,6 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                       aria-hidden
                     />
                   </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => go("order")}
-                  aria-label="Открыть QR в заказе"
-                  className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#ffd3b0] bg-white p-0 shadow-[0_2px_6px_rgba(0,0,0,0.06)] transition-colors duration-150 active:bg-[#fff9f5] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
-                >
-                  <img
-                    src={homeQrImage}
-                    alt=""
-                    className="block aspect-square h-10 w-10 min-h-10 min-w-10 shrink-0 rounded-lg object-cover"
-                    width={40}
-                    height={40}
-                  />
                 </button>
               </div>
           ) : (
@@ -636,14 +725,15 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
           {isKatyaHome ? (
             <>
               <div className="mt-3 space-y-1.5">
-                <div className="rounded-xl border border-[#ffd3b0] bg-white p-2 shadow-[0_3px_10px_rgba(0,0,0,0.08)]">
-                  <button
-                    type="button"
-                    className={cx(
-                      "grid w-full max-w-full grid-cols-2 gap-x-2 items-stretch pl-4 pr-0 text-left",
-                      "cursor-pointer rounded-lg border-0 bg-transparent p-0 font-inherit text-[#1c1c1c]",
-                      "transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6e00]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-                    )}
+                <div className="rounded-xl border border-[#ffd3b0] bg-white px-1.5 py-2 shadow-[0_3px_10px_rgba(0,0,0,0.08)]">
+                  <div className="flex min-h-[34px] items-stretch">
+                    <button
+                      type="button"
+                      className={cx(
+                        "flex shrink-0 items-center pl-1.5 pr-2 text-left",
+                        "cursor-pointer rounded-lg border-0 bg-transparent p-0 font-inherit text-[#1c1c1c]",
+                        "transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6e00]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                      )}
                     aria-expanded={katyaLoyaltyTierOpen}
                     aria-controls={katyaLoyaltyTierOpen ? "home-katya-loyalty-tier" : undefined}
                     aria-label={
@@ -653,28 +743,53 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                     }
                     onClick={() => setKatyaLoyaltyTierOpen((open) => !open)}
                   >
-                    <div className="flex min-h-[34px] min-w-0 items-center">
                       <div
-                        className="flex w-full items-baseline justify-center gap-1.5 text-2xl font-medium tabular-nums leading-none tracking-tight text-[#1c1c1c]"
+                        className="flex items-baseline justify-start gap-2 text-2xl font-medium tabular-nums leading-none tracking-tight text-[#1c1c1c]"
                         aria-label="На счёте 1 240 баллов"
                       >
                         <span>1 240</span>
                         <img
                           src={pointsLogo}
                           alt=""
-                          className="h-[0.92em] w-[0.92em] shrink-0 object-contain -translate-y-[0.06em]"
-                          width={20}
-                          height={20}
+                          className="h-[0.69em] w-[0.69em] shrink-0 object-contain -translate-y-[0.05em]"
+                          width={15}
+                          height={15}
                         />
                       </div>
-                    </div>
-                    <div className="min-w-0 w-fit border-l-0 pl-0">
-                      <div className={cx(homeEyebrow11, "w-full text-[#ff6e00]")}>К сгоранию</div>
-                      <p className="mt-0.5 w-full text-xs text-neutral-700 leading-snug">
+                    </button>
+                    <div className="mx-1.5 h-5 w-px shrink-0 self-center bg-[#e0e2e7]" aria-hidden />
+                    <button
+                      type="button"
+                      className={cx(
+                        "flex min-w-0 flex-1 flex-col justify-center pl-3 pr-2 text-left",
+                        "cursor-pointer rounded-lg border-0 bg-transparent p-0 font-inherit text-[#1c1c1c]",
+                        "transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6e00]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                      )}
+                      aria-expanded={katyaLoyaltyTierOpen}
+                      aria-controls={katyaLoyaltyTierOpen ? "home-katya-loyalty-tier" : undefined}
+                      onClick={() => setKatyaLoyaltyTierOpen((open) => !open)}
+                    >
+                      <div className={cx(homeEyebrow11, "whitespace-nowrap text-[#ff6e00]")}>К сгоранию</div>
+                      <p className="mt-0.5 whitespace-nowrap text-xs text-neutral-700 leading-snug">
                         <span className="font-semibold text-[#1c1c1c]">240</span> баллов до 30 июня
                       </p>
-                    </div>
-                  </button>
+                    </button>
+                    <div className="ml-2.5 mr-4 h-5 w-px shrink-0 self-center bg-[#e0e2e7]" aria-hidden />
+                    <button
+                      type="button"
+                      onClick={() => go("order")}
+                      aria-label="Открыть QR в заказе"
+                      className="flex w-10 shrink-0 items-center justify-center self-stretch bg-transparent p-0 pl-0 pr-0.5 transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6e00]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                    >
+                      <img
+                        src={homeQrImage}
+                        alt=""
+                        className="block aspect-square h-10 w-10 min-h-10 min-w-10 shrink-0 rounded-lg object-cover p-1 shadow-[0_2px_6px_rgba(0,0,0,0.06)]"
+                        width={40}
+                        height={40}
+                      />
+                    </button>
+                  </div>
                   {katyaLoyaltyTierOpen ? (
                     <div className="mt-1.5 pt-1.5">
                       <div
@@ -806,27 +921,27 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
         </section>
 
         {isKatyaHome && (
-          <section className="min-w-0 pb-4">
+          <section className="min-w-0">
             <div className="-mx-4">
-              <div className="flex snap-x snap-proximity gap-3 overflow-x-auto px-4 pb-1 scroll-px-4 [scrollbar-width:none] [-ms-overflow-style:none]">
-                <button
-                  type="button"
-                  onClick={() => go("catalog", { category: "all" })}
-                  className="w-[136px] shrink-0 snap-start rounded-2xl border border-[#009aa6]/25 bg-[#E6F5F7] p-3 text-left shadow-[0_4px_12px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-transform duration-150"
-                >
-                  <div className="text-[13px] font-semibold leading-4 text-[#009aa6]">Симптомы</div>
-                </button>
-                {homeCategories.map((category) => (
-                  <button
-                    type="button"
-                    key={category.id}
-                    onClick={() => go("catalog", { category: category.category })}
-                    className="w-[136px] shrink-0 snap-start rounded-2xl border border-[#e7e9ee] bg-white p-3 text-left shadow-[0_4px_12px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-transform duration-150"
-                  >
-                    <div className="text-[13px] font-semibold leading-4 text-[#1c1c1c]">{category.title}</div>
-                    <div className={cx(homeText11, "mt-1 w-full truncate text-neutral-500")}>{category.subtitle}</div>
-                  </button>
-                ))}
+              <div className="flex snap-x snap-proximity gap-3 overflow-x-auto px-4 pb-1 scroll-px-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                {katyaHomeQuickTiles.map((tile) => {
+                  const Icon = tile.icon;
+                  return (
+                    <button
+                      type="button"
+                      key={tile.id}
+                      onClick={() => go("catalog", { category: tile.category })}
+                      className="flex w-[76px] shrink-0 snap-start flex-col items-center gap-2 text-center active:scale-[0.98] transition-transform duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6e00]/35 focus-visible:ring-offset-2"
+                    >
+                      <span className="flex w-full flex-col items-center rounded-2xl border border-[#e7e9ee] bg-white p-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
+                        <span className="flex h-12 w-12 items-center justify-center">
+                          <Icon className="h-6 w-6 text-[#ff6e00]" strokeWidth={2} aria-hidden />
+                        </span>
+                      </span>
+                      <span className="w-full text-[13px] font-semibold leading-4 text-[#1c1c1c]">{tile.title}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </section>
@@ -900,11 +1015,9 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
           </>
         )}
 
-        <section>
-          <h2 className={cx(sectionTitleClass, "mb-2")}>Главное для вас</h2>
-          <div className="-mx-4">
-            <div className="flex items-stretch snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 scroll-px-4 [scrollbar-width:none] [-ms-overflow-style:none]">
-              {products.slice(0, 4).map((product) => (
+        <section className="min-w-0">
+          <div className="grid grid-cols-2 gap-3">
+              {homeFeaturedProducts.map((product) => (
                 <button
                   type="button"
                   key={product.id}
@@ -912,9 +1025,9 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                     setSelectedProduct(product);
                     go("product");
                   }}
-                  className="w-[160px] shrink-0 snap-start rounded-2xl border border-[#e7e9ee] bg-white p-3 text-left shadow-[0_4px_14px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-transform duration-150"
+                  className="min-w-0 w-full rounded-2xl border border-[#e7e9ee] bg-white p-3 text-left shadow-[0_4px_14px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-transform duration-150"
                 >
-                  <div className="h-[160px] rounded-xl bg-[#fff3e9] flex items-center justify-center">
+                  <div className="aspect-[4/5] w-full rounded-xl bg-[#fff3e9] flex items-center justify-center">
                     <Footprints size={28} className="text-[#ff6e00]" />
                   </div>
                   <div className="mt-2.5 text-[13px] font-semibold leading-[1.3] text-[#1c1c1c] line-clamp-2">{product.title}</div>
@@ -924,12 +1037,10 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
               <button
                 type="button"
                 onClick={() => go("catalog", { category: "all" })}
-                className="flex h-auto self-stretch w-[72px] shrink-0 snap-start flex-col items-center justify-center gap-1.5 rounded-2xl bg-neutral-100 text-neutral-400"
+                className="col-span-2 flex h-12 w-full items-center justify-center rounded-2xl border border-[#e7e9ee] bg-white text-sm font-semibold text-[#1c1c1c] shadow-[0_4px_14px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-transform duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1c1c1c]/10 focus-visible:ring-offset-2"
               >
-                <ChevronRight size={16} strokeWidth={1.5} />
-                <span className={cx(homeText11, "font-medium")}>Все</span>
+                Все товары
               </button>
-            </div>
           </div>
           {!isKatyaHome && (
             <div className="-mx-4 mt-3">
@@ -942,7 +1053,6 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                     className="w-[148px] shrink-0 snap-start rounded-2xl border border-[#e7e9ee] bg-white p-3 text-left shadow-[0_4px_12px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-transform duration-150"
                   >
                     <div className="text-[13px] font-semibold leading-4 text-[#1c1c1c]">{category.title}</div>
-                    <div className={cx(homeText11, "mt-1 text-neutral-500")}>{category.subtitle}</div>
                   </button>
                 ))}
               </div>
@@ -1456,6 +1566,50 @@ function Measure({ label, value, setValue, unit }) {
   );
 }
 
+function ServicesScreen({ go }) {
+  const services = [
+    {
+      eyebrow: "Консультация",
+      title: "Приём ортопеда",
+      description: "Осмотр и рекомендации по лечению",
+      action: () => go("salons"),
+    },
+    {
+      eyebrow: "Диагностика стоп",
+      title: "Индивидуальные стельки",
+      description: "Подбор под ваши параметры и нагрузку",
+      action: () => go("catalog", { category: "insoles" }),
+    },
+    {
+      eyebrow: "Точный подбор",
+      title: "Компрессия по меркам",
+      description: "Заказ изделий по индивидуальным меркам",
+      action: () => go("catalog", { category: "compression" }),
+    },
+  ];
+
+  return (
+    <div className="h-full overflow-y-auto pb-24 bg-[#f7f8fa]">
+      <Header title="Услуги" subtitle="Консультации и медицинский подбор" />
+
+      <div className="px-4 space-y-3">
+        {services.map((service) => (
+          <button
+            type="button"
+            key={service.title}
+            onClick={service.action}
+            className="w-full rounded-2xl border border-[#d9ecee] bg-white p-4 text-left shadow-[0_3px_10px_rgba(0,154,166,0.06)] active:scale-[0.98] transition-transform duration-150"
+          >
+            <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#009AA6]">{service.eyebrow}</div>
+            <div className="mt-1.5 text-sm font-semibold leading-5 text-[#1c1c1c]">{service.title}</div>
+            <div className="mt-1 text-xs text-neutral-500 leading-[1.4]">{service.description}</div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function SalonsScreen() {
   return (
     <div className="h-full overflow-y-auto pb-24">
@@ -1820,6 +1974,7 @@ export default function OrtekaMobilePrototype() {
   };
 
   const showBottomNav = !["product", "cart", "order", "size"].includes(screen);
+  const isKatyaHomeScreen = screen === "home" && homeProfileCustomer === "Катя";
 
   return (
     <PhoneShell>
@@ -1831,7 +1986,11 @@ export default function OrtekaMobilePrototype() {
           exit={{ opacity: 0, x: -18 }}
           transition={{ duration: 0.18 }}
           className="box-border h-full min-h-0 w-full overflow-x-hidden"
-          style={{ paddingTop: "max(2rem, env(safe-area-inset-top, 0px))" }}
+          style={
+            isKatyaHomeScreen
+              ? undefined
+              : { paddingTop: "max(2rem, env(safe-area-inset-top, 0px))" }
+          }
         >
           {screen === "home" && (
             <HomeScreen
@@ -1858,6 +2017,7 @@ export default function OrtekaMobilePrototype() {
 
           {screen === "product" && <ProductScreen product={selectedProduct} go={go} cartCount={cartCount} setCartCount={setCartCount} />}
           {screen === "size" && <SizeScreen go={go} setSelectedCategory={setSelectedCategory} />}
+          {screen === "services" && <ServicesScreen go={go} />}
           {screen === "salons" && <SalonsScreen />}
           {screen === "profile" && <ProfileScreen go={go} />}
           {screen === "favorites" && <FavoritesScreen go={go} setSelectedProduct={setSelectedProduct} />}
