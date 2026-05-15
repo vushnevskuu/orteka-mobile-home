@@ -169,15 +169,42 @@ const promoCards = [
 ];
 
 const homeOrderItems = [
-  { id: "ready", status: "К выдаче сегодня", tone: "ready", title: "Стельки ORTO Comfort", actionLabel: "Показать QR" },
-  { id: "in-transit", status: "Заказ в пути", tone: "transit", title: "5 товаров", actionLabel: "Открыть" },
-  { id: "needs-action", status: "Нужно подтверждение", tone: "attention", title: "Проверьте заказ", actionLabel: "Открыть" },
+  {
+    id: "ready",
+    tone: "ready",
+    title: "К выдаче сегодня",
+    address: "г. Москва, Тверская, 12",
+    timing: "Заберите сегодня до 21:00",
+    image: promoInsolesImage,
+  },
+  {
+    id: "in-transit",
+    tone: "transit",
+    title: "Заказ в пути",
+    address: "г. Москва, ул. Свободы, 40к1",
+    timing: "Приедет завтра",
+    image: promoCompressionImage,
+  },
+  {
+    id: "needs-action",
+    tone: "attention",
+    title: "Нужно подтверждение",
+    address: "г. Москва, Тверская, 12",
+    timing: "Подтвердите до 18:00",
+    image: promoShoesImage,
+  },
 ];
 
 const SAVED_FILTERS_STORAGE_KEY = "orteka.savedFilters.v1";
 const defaultSavedFilters = [
   { id: "insoles-39-near", label: "Стельки · размер 39 · есть рядом", category: "insoles", query: "стельки", onlyNearby: true },
   { id: "compression-m", label: "Трикотаж · M · 2 класс", category: "compression", query: "компрессия", onlyNearby: false },
+];
+
+const homeProfileCustomers = [
+  { name: "Катя", disabled: false },
+  { name: "Лёша", disabled: false },
+  { name: "Жильвинас", disabled: true },
 ];
 
 function cx(...classes) {
@@ -222,7 +249,31 @@ function Header({ title, subtitle, onBack, right }) {
   );
 }
 
-function BottomNav({ screen, go }) {
+function BottomNav({ screen, go, homeProfileCustomer, setHomeProfileCustomer }) {
+  const [homeProfilePickerOpen, setHomeProfilePickerOpen] = useState(false);
+  const homeTabProfileSwitch = screen === "home" && homeProfileCustomer === "Катя";
+
+  useEffect(() => {
+    if (!homeProfilePickerOpen) {
+      return;
+    }
+    const close = (event) => {
+      const nav = document.querySelector("[data-bottom-nav-root]");
+      if (nav && event.target instanceof Node && nav.contains(event.target)) {
+        return;
+      }
+      setHomeProfilePickerOpen(false);
+    };
+    window.addEventListener("pointerdown", close, true);
+    return () => window.removeEventListener("pointerdown", close, true);
+  }, [homeProfilePickerOpen]);
+
+  useEffect(() => {
+    if (screen !== "home") {
+      setHomeProfilePickerOpen(false);
+    }
+  }, [screen]);
+
   const items = [
     { id: "home", title: "Главная", image: tabHomeFigmaIcon, width: 34, height: 24, action: () => go("home") },
     { id: "catalog", title: "Каталог", image: tabCatalogFigmaIcon, width: 24, height: 24, action: () => go("catalog", { category: "all" }) },
@@ -233,13 +284,67 @@ function BottomNav({ screen, go }) {
 
   return (
     <nav
+      data-bottom-nav-root
       className="absolute bottom-0 left-0 right-0 z-40 bg-white px-2 pt-1 shadow-[0_-4px_8px_rgba(0,0,0,0.08)]"
       style={{ paddingBottom: "max(env(safe-area-inset-bottom), 6px)" }}
       aria-label="Основная навигация"
     >
+      {homeProfilePickerOpen && (
+        <div
+          className="absolute bottom-full left-2 right-2 z-50 mb-1 overflow-hidden rounded-2xl border border-[#e0e2e7] bg-white p-1 shadow-[0_12px_28px_rgba(0,0,0,0.14)]"
+          role="menu"
+        >
+          <div className="px-2 py-1.5 text-[11px] font-medium text-neutral-500">Профиль демо</div>
+          {homeProfileCustomers.map((customer) => (
+            <button
+              type="button"
+              key={customer.name}
+              role="menuitem"
+              disabled={customer.disabled}
+              onClick={() => {
+                if (customer.disabled) {
+                  return;
+                }
+                setHomeProfileCustomer(customer.name);
+                setHomeProfilePickerOpen(false);
+              }}
+              className={cx(
+                "flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm",
+                customer.name === homeProfileCustomer ? "bg-[#f4f5f7] font-semibold text-[#1c1c1c]" : "text-neutral-700",
+                customer.disabled && "cursor-not-allowed text-neutral-300"
+              )}
+            >
+              <span>{customer.name}</span>
+              {customer.disabled && <span className="text-[11px] font-medium">позже</span>}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="flex h-[52px] w-full items-center justify-around">
         {items.map((item) => {
           const active = screen === item.id;
+
+          if (item.id === "home" && homeTabProfileSwitch) {
+            return (
+              <button
+                type="button"
+                key={item.id}
+                aria-label={`Главная, сменить профиль (${homeProfileCustomer})`}
+                aria-expanded={homeProfilePickerOpen}
+                aria-haspopup="menu"
+                aria-current={active ? "page" : undefined}
+                onClick={() => setHomeProfilePickerOpen((open) => !open)}
+                className={cx(
+                  "flex min-h-12 min-w-12 shrink-0 items-center justify-center rounded-lg transition-colors duration-200 outline-none",
+                  "focus-visible:ring-2 focus-visible:ring-[#ff6e00]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                  active ? "opacity-100" : "opacity-85 hover:opacity-100",
+                  homeProfilePickerOpen && "bg-[#fff3e9]"
+                )}
+              >
+                <img src={item.image} alt="" width={item.width} height={item.height} className="object-contain opacity-100" />
+              </button>
+            );
+          }
 
           return (
             <button
@@ -273,21 +378,37 @@ function BottomNav({ screen, go }) {
   );
 }
 
-function SearchBar({ value, onChange, onFocus }) {
+function SearchBar({ value, onChange, onFocus, smartRibbon }) {
   return (
     <div className="relative">
-      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#1c1c1c]" size={22} />
+      <Search
+        className={cx("absolute left-4 top-1/2 -translate-y-1/2", smartRibbon ? "text-neutral-500" : "text-[#1c1c1c]")}
+        size={22}
+      />
       <input
         value={value}
         onChange={(event) => onChange(event.target.value)}
         onFocus={onFocus}
-        placeholder="Найти стельки, бандаж, ортез или обувь"
-        className="w-full h-[42px] rounded-lg bg-white border border-[#e0e2e7] pl-12 pr-12 text-base outline-none focus:ring-2 focus:ring-[#ff6e00]/30"
+        placeholder={
+          smartRibbon
+            ? "Умный поиск — размер, подсказки и наличие рядом"
+            : "Найти стельки, бандаж, ортез или обувь"
+        }
+        title={
+          smartRibbon
+            ? "Умный поиск — размер, подсказки и наличие рядом"
+            : "Найти стельки, бандаж, ортез или обувь"
+        }
+        className="orteka-search-input min-w-0 w-full h-11 overflow-hidden text-ellipsis whitespace-nowrap rounded-xl border border-[#e0e2e7] bg-white pl-12 pr-12 text-base text-[#1c1c1c] outline-none placeholder:text-neutral-500 focus:ring-2 focus:ring-[#ff6e00]/30"
+        aria-label={smartRibbon ? "Умный поиск по каталогу" : undefined}
       />
       <button
         type="button"
         aria-label="Поиск по фото"
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-700 hover:text-[#ff6e00] transition-colors"
+        className={cx(
+          "absolute right-3 top-1/2 -translate-y-1/2 transition-colors hover:text-[#ff6e00]",
+          smartRibbon ? "text-neutral-500" : "text-neutral-700"
+        )}
       >
         <Camera size={20} />
       </button>
@@ -359,20 +480,13 @@ function ProductCard({ product, onOpen, compact = false }) {
   );
 }
 
-function HomeScreen({ go, setSelectedProduct, setSearchValue }) {
-  const [selectedCustomer, setSelectedCustomer] = useState("Лёша");
+function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustomer, setHomeProfileCustomer }) {
   const [customerMenuOpen, setCustomerMenuOpen] = useState(false);
-  const orderStatusToneClass = {
-    ready: "bg-[#e9f8ef] text-[#1f8d4d]",
-    transit: "bg-[#eaf3ff] text-[#1f5ea8]",
-    attention: "bg-[#fff4e5] text-[#a05a00]",
-  };
+  const [katyaLoyaltyTierOpen, setKatyaLoyaltyTierOpen] = useState(true);
   const sectionTitleClass = "text-[15px] font-semibold text-[#1c1c1c]";
-  const customers = [
-    { name: "Лёша", disabled: false },
-    { name: "Катя", disabled: false },
-    { name: "Жильвинас", disabled: true },
-  ];
+  /** Единый ритм для строк 11px на главной (без leading-tight — он визуально «сжимает» межстрочный блок). */
+  const homeText11 = "text-[11px] leading-[1.45]";
+  const homeEyebrow11 = `${homeText11} font-semibold uppercase tracking-[0.08em]`;
   const promoSliderRef = useRef(null);
   const prioritizedOrderItems = [...homeOrderItems].sort((a, b) => {
     if (a.tone === "ready") return -1;
@@ -380,7 +494,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue }) {
     return 0;
   });
 
-  const isKatyaHome = selectedCustomer === "Катя";
+  const isKatyaHome = homeProfileCustomer === "Катя";
 
   useEffect(() => {
     const slider = promoSliderRef.current;
@@ -399,68 +513,115 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue }) {
 
   return (
     <div className="h-full overflow-y-auto overflow-x-hidden pb-20 bg-[#f7f8fa]">
-      <div className="px-4 pt-9 pb-4 space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="relative">
+      <div
+        className={cx(
+          "px-4 pb-4 space-y-4",
+          isKatyaHome ? "pt-2" : "pt-4"
+        )}
+      >
+        {!isKatyaHome && (
+          <div className="flex items-center justify-between">
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setCustomerMenuOpen((value) => !value)}
+                className="flex items-center gap-2 rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1c1c1c]/15"
+                aria-haspopup="menu"
+                aria-expanded={customerMenuOpen}
+              >
+                <img src={ortekaLogo} alt="ОРТЕКА" className="h-3.5 w-auto" />
+              </button>
+              {customerMenuOpen && (
+                <div className="absolute left-0 top-7 z-50 w-40 overflow-hidden rounded-2xl border border-[#e0e2e7] bg-white p-1 shadow-[0_12px_28px_rgba(0,0,0,0.14)]" role="menu">
+                  {homeProfileCustomers.map((customer) => (
+                    <button
+                      type="button"
+                      key={customer.name}
+                      role="menuitem"
+                      disabled={customer.disabled}
+                      onClick={() => {
+                        if (customer.disabled) {
+                          return;
+                        }
+                        setHomeProfileCustomer(customer.name);
+                        setCustomerMenuOpen(false);
+                      }}
+                      className={cx(
+                        "flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm",
+                        customer.name === homeProfileCustomer ? "bg-[#f4f5f7] font-semibold text-[#1c1c1c]" : "text-neutral-700",
+                        customer.disabled && "cursor-not-allowed text-neutral-300"
+                      )}
+                    >
+                      <span>{customer.name}</span>
+                      {customer.disabled && <span className={cx(homeText11, "font-medium")}>позже</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <button
               type="button"
-              onClick={() => setCustomerMenuOpen((value) => !value)}
-              className="flex items-center gap-2 rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1c1c1c]/15"
-              aria-haspopup="menu"
-              aria-expanded={customerMenuOpen}
+              aria-label="Уведомления"
+              className="w-10 h-10 rounded-xl border border-[#d7dbe3] bg-white text-[#1c1c1c] shadow-[0_2px_8px_rgba(0,0,0,0.06)] flex items-center justify-center transition-all duration-200 hover:bg-[#f5f7fb] hover:shadow-[0_3px_10px_rgba(0,0,0,0.08)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1c1c1c]/20"
             >
-              <img src={ortekaLogo} alt="ОРТЕКА" className="h-3.5 w-auto" />
+              <Bell size={20} />
             </button>
-            {customerMenuOpen && (
-              <div className="absolute left-0 top-7 z-50 w-40 overflow-hidden rounded-2xl border border-[#e0e2e7] bg-white p-1 shadow-[0_12px_28px_rgba(0,0,0,0.14)]" role="menu">
-                {customers.map((customer) => (
-                  <button
-                    type="button"
-                    key={customer.name}
-                    role="menuitem"
-                    disabled={customer.disabled}
-                    onClick={() => {
-                      if (customer.disabled) {
-                        return;
-                      }
-                      setSelectedCustomer(customer.name);
-                      setCustomerMenuOpen(false);
-                    }}
-                    className={cx(
-                      "flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm",
-                      customer.name === selectedCustomer ? "bg-[#f4f5f7] font-semibold text-[#1c1c1c]" : "text-neutral-700",
-                      customer.disabled && "cursor-not-allowed text-neutral-300"
-                    )}
-                  >
-                    <span>{customer.name}</span>
-                    {customer.disabled && <span className="text-[11px] font-medium">позже</span>}
-                  </button>
-                ))}
+          </div>
+        )}
+
+        <section className="rounded-3xl bg-[linear-gradient(135deg,#ffab6a_0%,#ffa374_12%,#ff9c68_24%,#ff945c_36%,#ff8b50_48%,#ff8244_58%,#ff7836_68%,#ff6e28_78%,#f06418_88%,#e75c00_100%)] p-4 text-white shadow-[0_6px_14px_rgba(255,110,0,0.18)] border border-[#ffb57a]/40">
+          {isKatyaHome ? (
+            <div className="flex items-center gap-1.5">
+              <button
+                  type="button"
+                  onClick={() => go("salons")}
+                  aria-label="Салон рядом, г. Москва, Тверская, 12. Подробнее в списке салонов"
+                  className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 rounded-xl px-0.5 py-1 text-left transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#ff8d3d]"
+                >
+                  <div className={cx(homeEyebrow11, "text-white/90 [text-shadow:none] shadow-none")}>
+                    Салон рядом
+                  </div>
+                  <div className="flex min-w-0 w-full items-center justify-start gap-0">
+                    <span className="min-w-0 max-w-[calc(100%-1.375rem)] truncate text-[15px] font-semibold leading-snug tracking-tight text-white [text-shadow:none] shadow-none">
+                      г. Москва, Тверская, 12
+                    </span>
+                    <ChevronRight
+                      className="shrink-0 -ml-px text-white opacity-95 [text-shadow:none] drop-shadow-none"
+                      size={20}
+                      strokeWidth={2}
+                      aria-hidden
+                    />
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => go("order")}
+                  aria-label="Открыть QR в заказе"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#ffd3b0] bg-white p-0 shadow-[0_2px_6px_rgba(0,0,0,0.06)] transition-colors duration-150 active:bg-[#fff9f5] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+                >
+                  <img
+                    src={homeQrImage}
+                    alt=""
+                    className="block aspect-square h-10 w-10 min-h-10 min-w-10 shrink-0 rounded-lg object-cover"
+                    width={40}
+                    height={40}
+                  />
+                </button>
               </div>
-            )}
-          </div>
-          <button
-            type="button"
-            aria-label="Уведомления"
-            className="w-10 h-10 rounded-xl border border-[#d7dbe3] bg-white text-[#1c1c1c] shadow-[0_2px_8px_rgba(0,0,0,0.06)] flex items-center justify-center transition-all duration-200 hover:bg-[#f5f7fb] hover:shadow-[0_3px_10px_rgba(0,0,0,0.08)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1c1c1c]/20"
-          >
-            <Bell size={20} />
-          </button>
-        </div>
-
-        <section className="rounded-3xl bg-[linear-gradient(135deg,#ffab6a_0%,#ffa374_12%,#ff9c68_24%,#ff945c_36%,#ff8b50_48%,#ff8244_58%,#ff7836_68%,#ff6e28_78%,#f06418_88%,#e75c00_100%)] px-4 pt-4 pb-4 text-white shadow-[0_6px_14px_rgba(255,110,0,0.18)] border border-[#ffb57a]/40">
-          <div className="flex items-center justify-between gap-[6px]">
-            <button type="button" onClick={() => go("salons")} className="flex min-w-0 items-center gap-2 text-left">
-              <span className="truncate text-sm font-semibold">г. Москва, Тверская, 12</span>
-              <ChevronRight size={18} className="shrink-0" />
-            </button>
-            <div className="shrink-0 rounded-xl bg-white px-2 py-1 text-sm font-semibold text-[#ff6e00] flex items-center gap-1" aria-label="Баллы: 1 240">
-              <span aria-hidden>1 240</span>
-              <img src={pointsLogo} alt="" className="h-3 w-3" aria-hidden />
+          ) : (
+            <div className="flex items-center justify-between gap-1.5">
+              <button type="button" onClick={() => go("salons")} className="flex min-w-0 items-center gap-2 text-left">
+                <span className="truncate text-sm font-semibold">г. Москва, Тверская, 12</span>
+                <ChevronRight size={18} className="shrink-0" />
+              </button>
+              <div className="shrink-0 rounded-xl bg-white px-2 py-1 text-sm font-semibold text-[#ff6e00] flex items-center gap-1" aria-label="Баллы: 1 240">
+                <span aria-hidden>1 240</span>
+                <img src={pointsLogo} alt="" className="h-3 w-3" aria-hidden />
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="mt-1.5">
+          <div className="mt-3">
             <SearchBar
               value=""
               onChange={(value) => {
@@ -468,74 +629,96 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue }) {
                 go("catalog", { category: "all" });
               }}
               onFocus={() => go("catalog", { category: "all" })}
+              smartRibbon={isKatyaHome}
             />
           </div>
 
           {isKatyaHome ? (
             <>
-              {/* Катя: тот же ритм, что у сетки «Салон / Баллы» ниже — две плитки + детальная карточка */}
-              <div className="mt-1.5 space-y-[6px]">
-                <div className="grid grid-cols-2 gap-[6px] items-stretch">
+              <div className="mt-3 space-y-1.5">
+                <div className="rounded-xl border border-[#ffd3b0] bg-white p-2 shadow-[0_3px_10px_rgba(0,0,0,0.08)]">
                   <button
                     type="button"
-                    onClick={() => go("salons")}
-                    className="rounded-xl border border-[#ffd3b0] bg-white px-3 py-2.5 text-left shadow-[0_3px_10px_rgba(0,0,0,0.08)] cursor-pointer flex flex-col justify-center gap-0.5 min-h-16 active:bg-[#fff9f5] transition-colors duration-150"
+                    className={cx(
+                      "grid w-full max-w-full grid-cols-2 gap-x-2 items-stretch pl-4 pr-0 text-left",
+                      "cursor-pointer rounded-lg border-0 bg-transparent p-0 font-inherit text-[#1c1c1c]",
+                      "transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6e00]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                    )}
+                    aria-expanded={katyaLoyaltyTierOpen}
+                    aria-controls={katyaLoyaltyTierOpen ? "home-katya-loyalty-tier" : undefined}
+                    aria-label={
+                      katyaLoyaltyTierOpen
+                        ? "Скрыть блок уровня программы лояльности"
+                        : "Показать блок уровня программы лояльности"
+                    }
+                    onClick={() => setKatyaLoyaltyTierOpen((open) => !open)}
                   >
-                    <div className="text-xs font-semibold text-[#ff6e00] leading-4">Салон рядом</div>
-                    <div className="text-sm font-semibold text-[#1c1c1c] leading-4 truncate">Тверская · 1.2 км</div>
-                    <div className="text-xs text-neutral-500 leading-4 truncate">Открыто до 22:00</div>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => go("order")}
-                    className="rounded-xl border border-[#ffd3b0] bg-white pl-3 pr-2 grid grid-cols-[1fr_40px] items-center gap-[6px] shadow-[0_3px_10px_rgba(0,0,0,0.08)] cursor-pointer min-h-16 active:bg-[#fff9f5] transition-colors duration-150"
-                  >
-                    <div className="min-w-0 text-left">
-                      <div className="text-xs font-semibold text-[#ff6e00] leading-4">QR заказа</div>
-                      <div className="mt-1 text-sm font-semibold leading-4 text-[#1c1c1c] truncate">Показать</div>
+                    <div className="flex min-h-[34px] min-w-0 items-center">
+                      <div
+                        className="flex w-full items-baseline justify-center gap-1.5 text-2xl font-medium tabular-nums leading-none tracking-tight text-[#1c1c1c]"
+                        aria-label="На счёте 1 240 баллов"
+                      >
+                        <span>1 240</span>
+                        <img
+                          src={pointsLogo}
+                          alt=""
+                          className="h-[0.92em] w-[0.92em] shrink-0 object-contain -translate-y-[0.06em]"
+                          width={20}
+                          height={20}
+                        />
+                      </div>
                     </div>
-                    <div className="h-10 w-10 shrink-0 rounded-lg bg-white p-1 shadow-[0_2px_6px_rgba(0,0,0,0.12)]">
-                      <img src={homeQrImage} alt="QR код" className="h-full w-full rounded-[6px] object-cover" />
-                    </div>
-                  </button>
-                </div>
-
-                <div className="rounded-xl border border-[#ffd3b0] bg-white p-3 shadow-[0_3px_10px_rgba(0,0,0,0.08)]">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="min-w-0 pr-3 border-r border-[#f0e8e0]">
-                      <div className="text-xs font-semibold text-[#ff6e00] uppercase tracking-wide">К сгоранию</div>
-                      <p className="mt-1.5 text-sm text-neutral-700 leading-snug">
+                    <div className="min-w-0 w-fit border-l-0 pl-0">
+                      <div className={cx(homeEyebrow11, "w-full text-[#ff6e00]")}>К сгоранию</div>
+                      <p className="mt-0.5 w-full text-xs text-neutral-700 leading-snug">
                         <span className="font-semibold text-[#1c1c1c]">240</span> баллов до 30 июня
                       </p>
                     </div>
-                    <div className="min-w-0 pl-0.5">
-                      <div className="text-xs font-semibold text-[#ff6e00] uppercase tracking-wide">Статус</div>
-                      <div className="mt-1 text-sm font-bold text-[#1c1c1c] leading-tight">Серебряный</div>
-                      <p className="mt-2 text-xs text-neutral-600 leading-snug">
-                        До Золотого: <span className="font-semibold text-[#1c1c1c]">2 760</span> баллов
-                      </p>
-                      <div className="mt-2 h-1.5 w-full rounded-full bg-neutral-100 overflow-hidden">
-                        <div className="h-full w-[31%] rounded-full bg-gradient-to-r from-[#ff8d3d] to-[#ff6e00]" />
+                  </button>
+                  {katyaLoyaltyTierOpen ? (
+                    <div className="mt-1.5 pt-1.5">
+                      <div
+                        id="home-katya-loyalty-tier"
+                        className="rounded-xl bg-white p-2.5 space-y-2 shadow-[0_2px_10px_rgba(15,23,42,0.06)]"
+                        aria-label="Уровень программы лояльности: Серебряный"
+                      >
+                        <div className="grid h-6 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2.5">
+                          <span className="min-w-0 truncate text-xs leading-6 text-neutral-600">
+                            До Золотого: <span className="font-semibold text-[#1c1c1c]">2 760</span> баллов
+                          </span>
+                          <span className="inline-flex h-6 shrink-0 items-center rounded-full border border-slate-400/90 bg-gradient-to-b from-white to-slate-100 px-2.5 text-[11px] font-semibold tracking-tight text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_1px_2px_rgba(15,23,42,0.12)]">
+                            Серебряный
+                          </span>
+                        </div>
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200 shadow-[inset_0_1px_2px_rgba(15,23,42,0.12)]">
+                          <div
+                            className="h-full w-[31%] rounded-full bg-gradient-to-r from-slate-500 via-slate-600 to-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]"
+                            aria-hidden
+                          />
+                        </div>
+                        <div className="space-y-1.5 pt-2">
+                          <p className={cx(homeText11, "whitespace-nowrap text-neutral-700")}>
+                            Доступно к списанию <span className="font-semibold text-[#009aa6]">5%</span> от стоимости покупки
+                          </p>
+                          <p className={cx(homeText11, "whitespace-nowrap text-neutral-700")}>
+                            Доступен кэшбек бонусами <span className="font-semibold text-[#009aa6]">10%</span>
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <span className="inline-flex items-center rounded-full bg-[#eefafa] px-2.5 py-1 text-xs font-semibold text-[#009aa6]">
-                      спишем 5% от товара
-                    </span>
-                  </div>
+                  ) : null}
                 </div>
               </div>
             </>
           ) : (
-            <div className="mt-1.5 grid grid-cols-2 gap-[6px]">
+            <div className="mt-3 grid grid-cols-2 gap-1.5">
               <button
                 type="button"
                 onClick={() => go("salons")}
-                className="h-16 rounded-xl border border-[#ffd3b0] bg-white px-3 text-left flex items-center justify-between gap-[6px] shadow-[0_3px_10px_rgba(0,0,0,0.08)] cursor-pointer"
+                className="h-16 rounded-xl border border-[#ffd3b0] bg-white px-3 text-left flex items-center justify-between gap-1.5 shadow-[0_3px_10px_rgba(0,0,0,0.08)] cursor-pointer"
               >
                 <div className="min-w-0">
-                  <div className="text-xs font-semibold text-[#ff6e00] leading-4">Салон рядом</div>
+                  <div className={cx(homeEyebrow11, "text-[#ff6e00]")}>Салон рядом</div>
                   <div className="mt-1 text-sm font-semibold text-[#1c1c1c] leading-4 truncate">Тверская · 1.2 км</div>
                 </div>
                 <ChevronRight size={16} className="shrink-0 text-[#ff6e00]" />
@@ -543,14 +726,14 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue }) {
               <button
                 type="button"
                 onClick={() => go("order")}
-                className="h-16 rounded-xl border border-[#ffd3b0] bg-white pl-3 pr-2 grid grid-cols-[1fr_40px] items-center gap-[6px] shadow-[0_3px_10px_rgba(0,0,0,0.08)] cursor-pointer"
+                className="h-16 rounded-xl border border-[#ffd3b0] bg-white pl-3 pr-2 grid grid-cols-[1fr_2.5rem] items-center gap-1.5 shadow-[0_3px_10px_rgba(0,0,0,0.08)] cursor-pointer"
               >
                 <div className="min-w-0 text-left">
-                  <div className="text-xs font-semibold text-[#ff6e00] leading-4">Баллы</div>
+                  <div className={cx(homeEyebrow11, "text-[#ff6e00]")}>Баллы</div>
                   <div className="mt-1 text-sm font-semibold leading-4 text-[#1c1c1c] truncate">240 сгорят 30 июня</div>
                 </div>
-                <div className="h-10 w-10 shrink-0 rounded-lg bg-white p-1 shadow-[0_2px_6px_rgba(0,0,0,0.12)]">
-                  <img src={homeQrImage} alt="QR код" className="h-full w-full rounded-[6px] object-cover" />
+                <div className="h-10 w-10 shrink-0 rounded-xl bg-white p-1 shadow-[0_2px_6px_rgba(0,0,0,0.12)]">
+                  <img src={homeQrImage} alt="QR код" className="h-full w-full rounded-lg object-cover" />
                 </div>
               </button>
             </div>
@@ -558,22 +741,42 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue }) {
         </section>
 
         <div className="-mx-4">
-          <div className="flex snap-x snap-proximity gap-3 overflow-x-auto pl-4 pr-4 pb-2 scroll-px-4 overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none]">
+          <div className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [-ms-overflow-style:none]">
           {prioritizedOrderItems.map((item) => (
-            <Card key={item.id} onClick={() => go("order")} className="!w-[296px] shrink-0 snap-start p-3 shadow-[0_3px_8px_rgba(0,0,0,0.04)]">
-              <div className="grid grid-cols-[88px_1fr] gap-[6px]">
-                <div className="h-[96px] rounded-xl border border-[#e0e2e7] bg-[#eef1f4] flex items-center justify-center">
-                  <ShoppingBag size={20} className="text-neutral-300" />
+            <motion.div
+              key={item.id}
+              role="button"
+              tabIndex={0}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => go("order")}
+              className="box-border flex w-full min-w-full shrink-0 snap-start snap-always cursor-pointer items-stretch pl-4 pr-4"
+            >
+              <div className="-ml-4 flex w-[64px] shrink-0 items-center justify-center rounded-r-2xl rounded-l-none bg-white py-3 pl-2.5 pr-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+                <img
+                  src={homeQrImage}
+                  alt=""
+                  className="size-11 shrink-0 aspect-square rounded-lg object-contain"
+                  width={44}
+                  height={44}
+                />
+              </div>
+              <div className="ml-2 flex min-w-0 flex-1 gap-2.5 rounded-2xl bg-white p-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+                <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-[#eef1f4]">
+                  {item.image ? (
+                    <img src={item.image} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <ShoppingBag size={20} className="text-neutral-300" />
+                    </div>
+                  )}
                 </div>
-                <div className="min-w-0 flex flex-col">
-                  <span className={cx("w-fit rounded-full px-2.5 py-1 text-[11px] font-semibold leading-none", orderStatusToneClass[item.tone])}>{item.status}</span>
-                  <div className="mt-2 text-[14px] font-semibold leading-5 text-[#1c1c1c] line-clamp-2">{item.title}</div>
-                  <div className="mt-auto self-end pt-2 text-[11px] font-medium text-neutral-400">
-                    {item.actionLabel}
-                  </div>
+                <div className="min-w-0 flex flex-col justify-center gap-0.5 py-0.5">
+                  <p className="text-[15px] font-semibold leading-[1.25] tracking-tight text-[#1c1c1c]">{item.title}</p>
+                  <p className="text-xs leading-4 text-neutral-500 line-clamp-2">{item.address}</p>
+                  <p className="text-sm leading-5 text-[#1c1c1c]">{item.timing}</p>
                 </div>
               </div>
-            </Card>
+            </motion.div>
           ))}
           </div>
         </div>
@@ -602,9 +805,38 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue }) {
           </div>
         </section>
 
+        {isKatyaHome && (
+          <section className="min-w-0 pb-4">
+            <div className="-mx-4">
+              <div className="flex snap-x snap-proximity gap-3 overflow-x-auto px-4 pb-1 scroll-px-4 [scrollbar-width:none] [-ms-overflow-style:none]">
+                <button
+                  type="button"
+                  onClick={() => go("catalog", { category: "all" })}
+                  className="w-[136px] shrink-0 snap-start rounded-2xl border border-[#009aa6]/25 bg-[#E6F5F7] p-3 text-left shadow-[0_4px_12px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-transform duration-150"
+                >
+                  <div className="text-[13px] font-semibold leading-4 text-[#009aa6]">Симптомы</div>
+                </button>
+                {homeCategories.map((category) => (
+                  <button
+                    type="button"
+                    key={category.id}
+                    onClick={() => go("catalog", { category: category.category })}
+                    className="w-[136px] shrink-0 snap-start rounded-2xl border border-[#e7e9ee] bg-white p-3 text-left shadow-[0_4px_12px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-transform duration-150"
+                  >
+                    <div className="text-[13px] font-semibold leading-4 text-[#1c1c1c]">{category.title}</div>
+                    <div className={cx(homeText11, "mt-1 w-full truncate text-neutral-500")}>{category.subtitle}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {!isKatyaHome && (
+          <>
         <section className="space-y-2">
           <h2 className={sectionTitleClass}>Симптомы</h2>
-          <div className="flex gap-2 overflow-x-auto pb-1 mr-[-16px] [scrollbar-width:none] [-ms-overflow-style:none]">
+          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 scroll-px-4 [scrollbar-width:none] [-ms-overflow-style:none]">
             {symptomTiles.map((item) => (
               <button
                 type="button"
@@ -622,17 +854,18 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue }) {
         </section>
 
         <section>
-          <div className="px-4 mb-2 flex items-center justify-between">
+          <div className="mb-2 flex items-center justify-between">
             <h2 className={sectionTitleClass}>Услуги</h2>
           </div>
-          <div className="flex snap-x snap-proximity gap-3 overflow-x-auto pl-0 pr-0 pb-2 -mr-4 scroll-px-4 [scrollbar-width:none] [-ms-overflow-style:none]">
+          <div className="-mx-4">
+            <div className="flex snap-x snap-proximity gap-3 overflow-x-auto px-4 pb-2 scroll-px-4 [scrollbar-width:none] [-ms-overflow-style:none]">
             <button
               type="button"
               onClick={() => go("salons")}
               className="w-[232px] shrink-0 snap-start rounded-2xl border border-[#d9ecee] bg-white p-4 text-left shadow-[0_3px_10px_rgba(0,154,166,0.06)] active:scale-[0.98] transition-transform duration-150 flex flex-col"
             >
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-[#009AA6]">Консультация</div>
-              <div className="mt-1.5 text-[14px] font-semibold leading-5 text-[#1c1c1c]">Прием ортопеда</div>
+              <div className={cx(homeEyebrow11, "text-[#009AA6]")}>Консультация</div>
+              <div className="mt-1.5 text-sm font-semibold leading-5 text-[#1c1c1c]">Прием ортопеда</div>
               <div className="mt-1 text-xs text-neutral-500 leading-[1.4]">Осмотр и рекомендации по лечению</div>
             </button>
             <button
@@ -640,8 +873,8 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue }) {
               onClick={() => go("catalog", { category: "insoles" })}
               className="w-[232px] shrink-0 snap-start rounded-2xl border border-[#d9ecee] bg-white p-4 text-left shadow-[0_3px_10px_rgba(0,154,166,0.06)] active:scale-[0.98] transition-transform duration-150 flex flex-col"
             >
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-[#009AA6]">Диагностика стоп</div>
-              <div className="mt-1.5 text-[14px] font-semibold leading-5 text-[#1c1c1c]">Индивидуальные стельки</div>
+              <div className={cx(homeEyebrow11, "text-[#009AA6]")}>Диагностика стоп</div>
+              <div className="mt-1.5 text-sm font-semibold leading-5 text-[#1c1c1c]">Индивидуальные стельки</div>
               <div className="mt-1 text-xs text-neutral-500 leading-[1.4]">Подбор под ваши параметры и нагрузку</div>
             </button>
             <button
@@ -649,8 +882,8 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue }) {
               onClick={() => go("catalog", { category: "compression" })}
               className="w-[232px] shrink-0 snap-start rounded-2xl border border-[#d9ecee] bg-white p-4 text-left shadow-[0_3px_10px_rgba(0,154,166,0.06)] active:scale-[0.98] transition-transform duration-150 flex flex-col"
             >
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-[#009AA6]">Точный подбор</div>
-              <div className="mt-1.5 text-[14px] font-semibold leading-5 text-[#1c1c1c]">Компрессия по меркам</div>
+              <div className={cx(homeEyebrow11, "text-[#009AA6]")}>Точный подбор</div>
+              <div className="mt-1.5 text-sm font-semibold leading-5 text-[#1c1c1c]">Компрессия по меркам</div>
               <div className="mt-1 text-xs text-neutral-500 leading-[1.4]">Заказ изделий по индивидуальным меркам</div>
             </button>
             <button
@@ -659,10 +892,13 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue }) {
               className="flex w-[72px] shrink-0 snap-start flex-col items-center justify-center gap-1.5 self-stretch rounded-2xl bg-neutral-100 text-neutral-400"
             >
               <ChevronRight size={16} strokeWidth={1.5} />
-              <span className="text-[11px] font-medium">Все</span>
+              <span className={cx(homeText11, "font-medium")}>Все</span>
             </button>
+            </div>
           </div>
         </section>
+          </>
+        )}
 
         <section>
           <h2 className={cx(sectionTitleClass, "mb-2")}>Главное для вас</h2>
@@ -682,7 +918,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue }) {
                     <Footprints size={28} className="text-[#ff6e00]" />
                   </div>
                   <div className="mt-2.5 text-[13px] font-semibold leading-[1.3] text-[#1c1c1c] line-clamp-2">{product.title}</div>
-                  <div className="mt-1.5 text-[14px] font-semibold text-[#1c1c1c]">{product.price}</div>
+                  <div className="mt-1.5 text-sm font-semibold text-[#1c1c1c]">{product.price}</div>
                 </button>
               ))}
               <button
@@ -691,14 +927,14 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue }) {
                 className="flex h-auto self-stretch w-[72px] shrink-0 snap-start flex-col items-center justify-center gap-1.5 rounded-2xl bg-neutral-100 text-neutral-400"
               >
                 <ChevronRight size={16} strokeWidth={1.5} />
-                <span className="text-[11px] font-medium">Все</span>
+                <span className={cx(homeText11, "font-medium")}>Все</span>
               </button>
             </div>
           </div>
-          <div className="-mx-4 mt-3">
-            <div className="flex snap-x snap-proximity gap-3 overflow-x-auto px-4 pb-1 scroll-px-4 [scrollbar-width:none] [-ms-overflow-style:none]">
-              {homeCategories.map((category) => {
-                return (
+          {!isKatyaHome && (
+            <div className="-mx-4 mt-3">
+              <div className="flex snap-x snap-proximity gap-3 overflow-x-auto px-4 pb-1 scroll-px-4 [scrollbar-width:none] [-ms-overflow-style:none]">
+                {homeCategories.map((category) => (
                   <button
                     type="button"
                     key={category.id}
@@ -706,12 +942,12 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue }) {
                     className="w-[148px] shrink-0 snap-start rounded-2xl border border-[#e7e9ee] bg-white p-3 text-left shadow-[0_4px_12px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-transform duration-150"
                   >
                     <div className="text-[13px] font-semibold leading-4 text-[#1c1c1c]">{category.title}</div>
-                    <div className="mt-1 text-[11px] leading-[1.4] text-neutral-500">{category.subtitle}</div>
+                    <div className={cx(homeText11, "mt-1 text-neutral-500")}>{category.subtitle}</div>
                   </button>
-                );
-              })}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </section>
 
       </div>
@@ -1476,6 +1712,7 @@ function OrderScreen({ go }) {
 
 export default function OrtekaMobilePrototype() {
   const [screen, setScreen] = useState("home");
+  const [homeProfileCustomer, setHomeProfileCustomer] = useState("Катя");
   const [selectedProduct, setSelectedProduct] = useState(products[0]);
   const [searchValue, setSearchValue] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -1593,13 +1830,16 @@ export default function OrtekaMobilePrototype() {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -18 }}
           transition={{ duration: 0.18 }}
-          className="h-full"
+          className="box-border h-full min-h-0 w-full overflow-x-hidden"
+          style={{ paddingTop: "max(2rem, env(safe-area-inset-top, 0px))" }}
         >
           {screen === "home" && (
             <HomeScreen
               go={go}
               setSelectedProduct={setSelectedProduct}
               setSearchValue={setSearchValue}
+              homeProfileCustomer={homeProfileCustomer}
+              setHomeProfileCustomer={setHomeProfileCustomer}
             />
           )}
 
@@ -1626,7 +1866,9 @@ export default function OrtekaMobilePrototype() {
         </motion.div>
       </AnimatePresence>
 
-      {showBottomNav && <BottomNav screen={screen} go={go} />}
+      {showBottomNav && (
+        <BottomNav screen={screen} go={go} homeProfileCustomer={homeProfileCustomer} setHomeProfileCustomer={setHomeProfileCustomer} />
+      )}
       {toastMessage && (
         <div className="absolute bottom-16 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-[#1c1c1c] px-3 py-2 text-xs font-medium text-white shadow-lg">
           {toastMessage}
