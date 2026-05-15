@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   BadgePercent,
   Bandage,
+  Bed,
   Bell,
   Bone,
   Calendar,
@@ -29,9 +30,9 @@ import {
   Sparkles,
   SportShoe,
   Star,
-  Store,
   Stethoscope,
   User,
+  Wifi,
   X,
 } from "lucide-react";
 import ortekaLogo from "./assets/orteka-logo.png";
@@ -65,7 +66,6 @@ import tabCatalogFigmaIcon from "./assets/tab-catalog-figma.svg";
 import tabFavFigmaIcon from "./assets/tab-fav-figma.svg";
 import tabHomeFigmaIcon from "./assets/tab-home-figma.svg";
 import tabProfileFigmaIcon from "./assets/tab-profile-figma.svg";
-import tabServicesFigmaIcon from "./assets/tab-services-figma.svg";
 import { QuickTileFilledIcon } from "./components/QuickTileFilledIcons";
 
 const categories = [
@@ -372,6 +372,18 @@ const zhilvinasHeaderQuickTiles = katyaHomeQuickTiles
   .filter((tile) => tile.id !== "hits")
   .map((tile) => (tile.id === "sfr" ? { ...tile, title: "СФР" } : tile));
 
+/** Плитки каталога orteka.ru — только лента Жильвинаса (порядок как на /catalog/). */
+const zhilvinasCatalogQuickTiles = [
+  { id: "booking", title: "Записаться", screen: "services", icon: Calendar, accent: "brand" },
+  { id: "new", title: "Новинки", category: "all", icon: Sparkles },
+  { id: "ortho-goods", title: "Ортезы", category: "braces", icon: Bandage },
+  { id: "shoes", title: "Обувь", category: "shoes", icon: SportShoe },
+  { id: "compression", title: "Трикотаж", category: "compression", icon: ShieldCheck },
+  { id: "insoles-series", title: "Стельки", category: "insoles", icon: Footprints },
+  { id: "sleep", title: "Сон", category: "all", icon: Bed },
+  { id: "promo", title: "Акции", category: "all", icon: BadgePercent },
+];
+
 const homeCategories = [
   { id: "promo", title: "Акции", category: "all" },
   { id: "insoles", title: "Стельки", category: "insoles" },
@@ -574,13 +586,23 @@ const zhilvinasHomeSegments = [
 
 const zhilvinasSearchMarqueePlaceholder = "Спросите меня, что подойдёт при боли или травме";
 
-const zhilvinasSpecialistHelpSectionClass =
-  "rounded-2xl bg-[radial-gradient(ellipse_88%_72%_at_100%_0%,rgba(0,154,166,0.14)_0%,transparent_58%),linear-gradient(165deg,#f5fcfd_0%,#eaf7f9_48%,#deeff3_100%)] p-3 shadow-[0_6px_20px_rgba(0,154,166,0.09)]";
-const zhilvinasSpecialistHelpTitleClass = "text-[#007a84]";
-const zhilvinasSpecialistHelpCardClass =
-  "w-[232px] shrink-0 snap-start rounded-2xl bg-white/95 p-3 text-left shadow-[0_2px_10px_rgba(0,154,166,0.08)] active:scale-[0.98] transition-transform duration-150 flex flex-col gap-0.5";
-const zhilvinasSpecialistHelpMoreButtonClass =
-  "flex w-[72px] shrink-0 snap-start flex-col items-center justify-center gap-1 self-stretch rounded-2xl bg-white/92 py-3 text-[#009AA6] active:scale-[0.98] transition-transform duration-150";
+/**
+ * Лента категорий Жильвинаса — сбалансированный ритм:
+ * 60px иконки, 64px колонка, 10px между колонками (~14px между квадратами).
+ */
+const zhilvinasCatalogTilesRowClass =
+  "flex snap-x snap-proximity gap-2.5 overflow-x-auto scroll-px-4 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden";
+const zhilvinasCatalogTileButtonClass =
+  "w-[64px] shrink-0 snap-start flex-col items-center justify-center gap-1.5";
+const zhilvinasCatalogTileIconBoxClass =
+  "mx-auto flex aspect-square w-[60px] shrink-0 items-center justify-center rounded-2xl p-1.5";
+const zhilvinasCatalogTileLabelClass =
+  "block w-full text-center text-[12px] font-medium leading-tight text-[#1c1c1c]";
+/** CTA «Записаться» — фирменный бирюзовый, контраст с белыми плитками. */
+const zhilvinasCatalogCtaTileIconClass = `${zhilvinasCatalogTileIconBoxClass} border-0 shadow-[0_6px_16px_rgba(0,154,166,0.28)] bg-[radial-gradient(ellipse_80%_70%_at_100%_0%,rgba(255,255,255,0.22)_0%,transparent_55%),linear-gradient(155deg,#007a84_0%,#009AA6_42%,#00b0be_100%)]`;
+const zhilvinasCatalogCtaTileLabelClass =
+  "block w-full text-center text-[12px] font-semibold leading-tight text-[#007a84]";
+const zhilvinasCatalogDefaultTileIconClass = `${zhilvinasCatalogTileIconBoxClass} border border-[#e7e9ee] bg-white shadow-[0_4px_12px_rgba(0,0,0,0.04)]`;
 
 const katyaHeaderGradientClass =
   "bg-[radial-gradient(ellipse_82%_64%_at_94%_108%,#ffb35a_0%,rgba(255,104,24,0.38)_50%,transparent_72%),linear-gradient(168deg,#d95800_0%,#ff6e00_30%,#ff7a28_58%,#b84700_100%)]";
@@ -598,50 +620,90 @@ const zhilvinasUnifiedHeaderShellClass = cx(
   katyaHeaderShellShadowClass
 );
 
-function HomeSalonNearbyButton({ go, homeEyebrow11, showEyebrow = true }) {
+/**
+ * Типографика оранжевой шапки Жильвинаса — один letter-spacing (normal),
+ * без tracking-tight: на кириллице короткая и длинная подпись иначе выглядят по-разному.
+ */
+const zhilvinasHeaderTrackingClass = "tracking-normal";
+const zhilvinasSalonRowTextClass = cx(
+  "font-sans text-sm font-normal leading-snug text-white [text-shadow:none] shadow-none",
+  zhilvinasHeaderTrackingClass
+);
+
+function HomeSalonNearbyButton({
+  go,
+  homeEyebrow11,
+  showEyebrow = true,
+  compactInline = false,
+  salonRowStyle = "default",
+}) {
+  const isZhilvinasSalonRow = salonRowStyle === "zhilvinas" && !showEyebrow;
   return (
-    <div className="flex w-full items-center gap-2">
+    <div className={cx("flex items-center", compactInline ? "shrink-0 gap-1.5" : "w-full gap-1")}>
       <button
         type="button"
         onClick={() => go("salons")}
         aria-label={
           showEyebrow
             ? "Салон рядом, г. Москва, Тверская, 12. Подробнее в списке салонов"
-            : "г. Москва, Тверская, 12. Подробнее в списке салонов"
+            : "Ближайший салон: г. Москва, Тверская, 12. Подробнее в списке салонов"
         }
         className={cx(
-          "flex min-w-0 flex-1 flex-col justify-center rounded-xl px-0.5 py-1 text-left transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2",
+          "min-w-0 rounded-xl px-0.5 py-1 text-left transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2",
           katyaHeaderFocusRingOffsetClass,
-          showEyebrow ? "gap-1.5" : "gap-0"
+          compactInline
+            ? "flex shrink items-center gap-1.5"
+            : isZhilvinasSalonRow
+              ? "flex flex-1 flex-row items-center gap-2"
+              : cx("flex flex-1 flex-col justify-center", showEyebrow ? "gap-1.5" : "gap-0")
         )}
       >
         {showEyebrow ? (
           <div className={cx(homeEyebrow11, "text-white/90 [text-shadow:none] shadow-none")}>Салон рядом</div>
         ) : null}
-        <div className="flex min-w-0 w-full items-center justify-start gap-2">
-          {!showEyebrow ? (
-            <Store className="h-5 w-5 shrink-0 text-white" strokeWidth={2} aria-hidden />
-          ) : null}
-          <div className="flex min-w-0 flex-1 items-center gap-0.5">
-            <span className="min-w-0 truncate text-[15px] font-semibold leading-snug tracking-tight text-white [text-shadow:none] shadow-none">
-              г. Москва, Тверская, 12
-            </span>
+        {compactInline ? (
+          <div className={cx(zhilvinasSalonRowTextClass, "flex items-center gap-1.5")}>
+            <span className="w-fit shrink-0">Ближайший салон:</span>
+            <span className="max-w-[5.25rem] truncate">г. Москва, Тверская, 12</span>
+            <ChevronRight className="shrink-0 text-white opacity-95" size={16} strokeWidth={2} aria-hidden />
+          </div>
+        ) : isZhilvinasSalonRow ? (
+          <div className={cx(zhilvinasSalonRowTextClass, "flex min-w-0 flex-1 items-center gap-1")}>
+            <span className="w-fit shrink-0">Ближайший салон:</span>
+            <span className="min-w-0 flex-1 truncate">г. Москва, Тверская, 12</span>
             <ChevronRight
-              className="shrink-0 -ml-px text-white opacity-95 [text-shadow:none] drop-shadow-none"
-              size={20}
+              className="shrink-0 text-white opacity-95 [text-shadow:none] drop-shadow-none"
+              size={18}
               strokeWidth={2}
               aria-hidden
             />
           </div>
-        </div>
+        ) : (
+          <div className="flex min-w-0 w-full items-center justify-start gap-2">
+            <div className="flex min-w-0 flex-1 items-center gap-0.5">
+              <span className="min-w-0 truncate text-[15px] font-semibold leading-snug tracking-tight text-white [text-shadow:none] shadow-none">
+                г. Москва, Тверская, 12
+              </span>
+              <ChevronRight
+                className="shrink-0 -ml-px text-white opacity-95 [text-shadow:none] drop-shadow-none"
+                size={20}
+                strokeWidth={2}
+                aria-hidden
+              />
+            </div>
+          </div>
+        )}
       </button>
       {!showEyebrow ? (
         <div
-          className="shrink-0 rounded-xl bg-white px-2 py-1 text-sm font-semibold text-[#ff6e00] flex items-center gap-1"
+          className={cx(
+            "flex shrink-0 items-center gap-1 rounded-xl bg-white px-2 py-1 text-sm font-semibold text-[#ff6e00]",
+            isZhilvinasSalonRow && zhilvinasHeaderTrackingClass
+          )}
           aria-label="Баллы: 1 240"
         >
           <span aria-hidden>1 240</span>
-          <img src={pointsLogo} alt="" className="h-3 w-3" aria-hidden />
+          <img src={pointsLogo} srcSet={`${pointsLogo} 1x, ${pointsLogo2x} 2x`} alt="" className="h-3 w-3" aria-hidden />
         </div>
       ) : null}
     </div>
@@ -649,7 +711,12 @@ function HomeSalonNearbyButton({ go, homeEyebrow11, showEyebrow = true }) {
 }
 function HomeQuickTilesRow({ go, variant = "feed" }) {
   const isHeader = variant === "header";
-  const tiles = isHeader ? zhilvinasHeaderQuickTiles : katyaHomeQuickTiles;
+  const isZhilvinasCatalog = variant === "zhilvinas";
+  const tiles = isHeader
+    ? zhilvinasHeaderQuickTiles
+    : isZhilvinasCatalog
+      ? zhilvinasCatalogQuickTiles
+      : katyaHomeQuickTiles;
 
   return (
     <div
@@ -657,11 +724,14 @@ function HomeQuickTilesRow({ go, variant = "feed" }) {
         "-mx-4 px-4",
         isHeader
           ? "mt-3 grid grid-cols-5 gap-1"
-          : "flex snap-x snap-proximity gap-2.5 overflow-x-auto scroll-px-4 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          : isZhilvinasCatalog
+            ? zhilvinasCatalogTilesRowClass
+            : "flex snap-x snap-proximity gap-2.5 overflow-x-auto scroll-px-4 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
       )}
     >
       {tiles.map((tile) => {
         const Icon = tile.icon;
+        const isBrandCta = isZhilvinasCatalog && tile.accent === "brand";
 
         return (
           <button
@@ -676,9 +746,19 @@ function HomeQuickTilesRow({ go, variant = "feed" }) {
             }}
             className={cx(
               "flex flex-col items-center text-center active:scale-[0.98] transition-transform duration-150",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2",
-              katyaHeaderFocusRingOffsetClass,
-              isHeader ? "min-w-0 gap-1.5" : "w-[76px] shrink-0 snap-start gap-2"
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+              isHeader
+                ? "focus-visible:ring-white/70 " + katyaHeaderFocusRingOffsetClass
+                : isBrandCta
+                  ? "focus-visible:ring-[#009AA6]/45 focus-visible:ring-offset-[#f7f8fa]"
+                  : isZhilvinasCatalog
+                    ? "focus-visible:ring-[#009AA6]/30 focus-visible:ring-offset-[#f7f8fa]"
+                    : "focus-visible:ring-[#ff6e00]/35 focus-visible:ring-offset-white",
+              isHeader
+                ? "min-w-0 gap-1.5"
+                : isZhilvinasCatalog
+                  ? zhilvinasCatalogTileButtonClass
+                  : "w-[76px] shrink-0 snap-start gap-2"
             )}
           >
             {isHeader ? (
@@ -686,16 +766,34 @@ function HomeQuickTilesRow({ go, variant = "feed" }) {
                 <QuickTileFilledIcon tileId={tile.id} />
               </span>
             ) : (
-              <span className="flex h-12 w-12 w-full items-center justify-center rounded-2xl border border-[#e7e9ee] bg-white p-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
-                <Icon className="h-6 w-6 text-[#ff6e00]" strokeWidth={2} aria-hidden />
+              <span
+                className={
+                  isZhilvinasCatalog
+                    ? isBrandCta
+                      ? zhilvinasCatalogCtaTileIconClass
+                      : zhilvinasCatalogDefaultTileIconClass
+                    : "flex h-12 w-12 w-full shrink-0 items-center justify-center rounded-2xl border border-[#e7e9ee] bg-white p-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)]"
+                }
+              >
+                <Icon
+                  className={cx(
+                    isBrandCta ? "h-5 w-5 text-white" : "text-[#ff6e00]",
+                    !isBrandCta && (isZhilvinasCatalog ? "h-5 w-5" : "h-6 w-6")
+                  )}
+                  strokeWidth={isBrandCta ? 2.25 : 2}
+                  aria-hidden
+                />
               </span>
             )}
             <span
               className={cx(
-                "w-full line-clamp-2",
                 isHeader
-                  ? "text-[11px] font-medium leading-[1.2] tracking-tight text-white"
-                  : "text-[13px] font-normal leading-4 text-[#1c1c1c]"
+                  ? "w-full line-clamp-2 text-[11px] font-medium leading-[1.2] tracking-tight text-white"
+                  : isBrandCta
+                    ? zhilvinasCatalogCtaTileLabelClass
+                    : isZhilvinasCatalog
+                      ? zhilvinasCatalogTileLabelClass
+                      : "w-full line-clamp-2 text-[13px] font-normal leading-4 text-[#1c1c1c]"
               )}
             >
               {tile.title}
@@ -707,12 +805,22 @@ function HomeQuickTilesRow({ go, variant = "feed" }) {
   );
 }
 
-function KatyaHomeSegmentTabs({ value, onChange, layoutId = "katya-home-segment-pill", segments = katyaHomeSegments }) {
+function KatyaHomeSegmentTabs({
+  value,
+  onChange,
+  layoutId = "katya-home-segment-pill",
+  segments = katyaHomeSegments,
+  className,
+  tabTrackingClass = "tracking-tight",
+}) {
   return (
     <motion.div
       role="tablist"
       aria-label="Разделы главной"
-      className="mt-3 flex gap-0.5 rounded-2xl bg-[#b84700]/28 p-1 ring-1 ring-inset ring-white/30 backdrop-blur-[3px]"
+      className={cx(
+        "mt-3 flex gap-0.5 rounded-2xl bg-[#b84700]/28 p-1 ring-1 ring-inset ring-white/30 backdrop-blur-[3px]",
+        className
+      )}
     >
       {segments.map((segment) => {
         const active = value === segment.id;
@@ -726,7 +834,8 @@ function KatyaHomeSegmentTabs({ value, onChange, layoutId = "katya-home-segment-
             onClick={() => onChange(segment.id)}
             className={cx(
               "relative z-0 flex min-h-9 min-w-0 flex-1 items-center justify-center rounded-[10px] px-2 py-2",
-              "text-[11px] font-semibold leading-none tracking-tight transition-colors duration-200",
+              "text-[11px] font-semibold leading-none transition-colors duration-200",
+              tabTrackingClass,
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2",
               katyaHeaderFocusRingOffsetClass,
               active ? "text-[#1c1c1c]" : "text-white/90 hover:text-white"
@@ -749,6 +858,53 @@ function KatyaHomeSegmentTabs({ value, onChange, layoutId = "katya-home-segment-
 
 function cx(...classes) {
   return classes.filter(Boolean).join(" ");
+}
+
+function PhoneStatusCellularIcon({ className }) {
+  return (
+    <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor" className={className} aria-hidden>
+      <rect x="0" y="7" width="3" height="5" rx="0.6" />
+      <rect x="5" y="5" width="3" height="7" rx="0.6" />
+      <rect x="10" y="2.5" width="3" height="9.5" rx="0.6" />
+      <rect x="15" y="0" width="3" height="12" rx="0.6" />
+    </svg>
+  );
+}
+
+function PhoneStatusBatteryIcon({ className }) {
+  return (
+    <svg width="25" height="12" viewBox="0 0 25 12" fill="none" className={className} aria-hidden>
+      <rect x="0.5" y="0.5" width="21" height="11" rx="2.8" stroke="currentColor" strokeOpacity="0.38" />
+      <rect x="2" y="2" width="17" height="8" rx="1.6" fill="currentColor" />
+      <path
+        d="M22.5 4.2c.8 0 1.5.6 1.5 1.3v1c0 .7-.7 1.3-1.5 1.3h-.5V4.2h.5z"
+        fill="currentColor"
+        fillOpacity="0.38"
+      />
+    </svg>
+  );
+}
+
+/** Статус-бар iOS внутри оранжевой шапки (прототип). */
+function PhoneStatusBar({ className }) {
+  return (
+    <div
+      className={cx(
+        "flex h-11 items-end justify-between pb-1.5 pl-[18px] pr-[16px] pt-[max(2px,env(safe-area-inset-top,0px))] sm:pt-2",
+        className
+      )}
+      aria-hidden
+    >
+      <time className={cx("text-[15px] font-semibold leading-none text-white tabular-nums", zhilvinasHeaderTrackingClass)}>
+        9:41
+      </time>
+      <div className="flex items-center gap-[5px] text-white">
+        <PhoneStatusCellularIcon />
+        <Wifi size={15} strokeWidth={2.35} className="-mt-px shrink-0" aria-hidden />
+        <PhoneStatusBatteryIcon />
+      </div>
+    </div>
+  );
 }
 
 function PhoneShell({ children }) {
@@ -814,14 +970,9 @@ function BottomNav({ screen, go, homeProfileCustomer, setHomeProfileCustomer }) 
     }
   }, [screen]);
 
-  const showServicesTab = homeProfileCustomer === "Катя";
-
   const items = [
     { id: "home", title: "Главная", image: tabHomeFigmaIcon, width: 34, height: 24, action: () => go("home") },
     { id: "catalog", title: "Каталог", image: tabCatalogFigmaIcon, width: 24, height: 24, action: () => go("catalog", { category: "all" }) },
-    ...(showServicesTab
-      ? [{ id: "services", title: "Услуги", image: tabServicesFigmaIcon, width: 24, height: 24, action: () => go("services") }]
-      : []),
     { id: "cart", title: "Корзина", image: tabCartFigmaIcon, width: 24, height: 24, action: () => go("cart") },
     { id: "favorites", title: "Избранное", image: tabFavFigmaIcon, width: 24, height: 24, action: () => go("favorites") },
     { id: "profile", title: "Профиль", image: tabProfileFigmaIcon, width: 24, height: 24, action: () => go("profile") },
@@ -919,7 +1070,7 @@ function BottomNav({ screen, go, homeProfileCustomer, setHomeProfileCustomer }) 
   );
 }
 
-function SearchBar({ value, onChange, onFocus, smartRibbon, marqueePlaceholder }) {
+function SearchBar({ value, onChange, onFocus, smartRibbon, marqueePlaceholder, inputClassName }) {
   const [isFocused, setIsFocused] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
@@ -955,7 +1106,8 @@ function SearchBar({ value, onChange, onFocus, smartRibbon, marqueePlaceholder }
         title={placeholderText}
         className={cx(
           "orteka-search-input min-w-0 w-full h-11 overflow-hidden text-ellipsis whitespace-nowrap rounded-xl border border-[#e0e2e7] bg-white pl-12 text-base text-[#1c1c1c] outline-none placeholder:text-neutral-500 focus:ring-2 focus:ring-[#ff6e00]/30",
-          smartRibbon ? "pr-[4.75rem]" : "pr-12"
+          smartRibbon ? "pr-[4.75rem]" : "pr-12",
+          inputClassName
         )}
         aria-label={smartRibbon || marqueePlaceholder ? placeholderText : undefined}
       />
@@ -1205,28 +1357,32 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
             !(isZhilvinasProfile && usesHomeSegments) && "contents"
           )}
         >
+        {isKatyaFlatHeader && isZhilvinasProfile && usesHomeSegments ? <PhoneStatusBar /> : null}
         <section
           className={cx(
             isKatyaProfile
               ? cx(
-                  "-mx-4 border-0 px-4 pb-0 pt-[max(2.75rem,calc(env(safe-area-inset-top,0px)+1rem))] text-white sm:pt-12",
+                  "-mx-4 border-0 px-4 pb-0 pt-1 text-white",
                   katyaHeaderGradientClass
                 )
               : isZhilvinasProfile && usesHomeSegments
-                ? "border-0 bg-transparent px-4 pb-1 pt-[max(2.75rem,calc(env(safe-area-inset-top,0px)+1rem))] text-white"
+                ? "border-0 bg-transparent px-4 pb-1 pt-0 text-white"
                 : cx(
                     "-mx-4 border-x-0 border-b px-4 text-white",
                     katyaHeaderGradientClass,
                     katyaHeaderShellEdgeClass,
                     isKatyaFlatHeader
                       ? cx(
-                          "border-t-0 pt-[max(2.75rem,calc(env(safe-area-inset-top,0px)+1rem))] sm:pt-12",
+                          "border-t-0 pt-1 sm:pt-2",
                           isZhilvinasProfile ? "pb-4" : "pb-0"
                         )
                       : cx("rounded-3xl border-t pt-4 pb-4", katyaHeaderShellShadowClass)
                   )
           )}
         >
+          {isKatyaFlatHeader && !(isZhilvinasProfile && usesHomeSegments) ? (
+            <PhoneStatusBar className="-mx-4 mb-0.5 px-4 sm:mx-0" />
+          ) : null}
           {isKatyaHome ? (
             isKatyaProfile ? (
               <div className="flex min-h-6 items-center justify-between gap-3 font-sans">
@@ -1260,8 +1416,22 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
             ) : (
               <HomeSalonNearbyButton go={go} homeEyebrow11={homeEyebrow11} />
             )
+          ) : isZhilvinasProfile && usesHomeSegments ? (
+            <KatyaHomeSegmentTabs
+              value={katyaHomeSegment}
+              onChange={setKatyaHomeSegment}
+              segments={zhilvinasHomeSegments}
+              layoutId="zhilvinas-home-segment-pill"
+              className="mt-0"
+              tabTrackingClass={zhilvinasHeaderTrackingClass}
+            />
           ) : isZhilvinasProfile ? (
-            <HomeSalonNearbyButton go={go} homeEyebrow11={homeEyebrow11} showEyebrow={false} />
+            <HomeSalonNearbyButton
+              go={go}
+              homeEyebrow11={homeEyebrow11}
+              showEyebrow={false}
+              salonRowStyle="zhilvinas"
+            />
           ) : (
             <div className="flex items-center justify-between gap-1.5">
               <button type="button" onClick={() => go("salons")} className="flex min-w-0 items-center gap-2 text-left">
@@ -1447,7 +1617,6 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
             </>
           )}
 
-          {isZhilvinasProfile && <HomeQuickTilesRow go={go} variant="header" />}
         </section>
 
         {usesHomeSegments && (
@@ -1476,22 +1645,46 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                   )
             )}
           >
-            <SearchBar
-              value=""
-              onChange={(value) => {
-                setSearchValue(value);
-                go("catalog", { category: "all" });
-              }}
-              onFocus={() => go("catalog", { category: "all" })}
-              smartRibbon={isKatyaProfile}
-              marqueePlaceholder={isZhilvinasProfile ? zhilvinasSearchMarqueePlaceholder : undefined}
-            />
-            <KatyaHomeSegmentTabs
-              value={katyaHomeSegment}
-              onChange={setKatyaHomeSegment}
-              segments={isZhilvinasProfile ? zhilvinasHomeSegments : katyaHomeSegments}
-              layoutId={isZhilvinasProfile ? "zhilvinas-home-segment-pill" : "katya-home-segment-pill"}
-            />
+            {isZhilvinasProfile ? (
+              <div className="flex min-w-0 flex-col gap-3">
+                <HomeSalonNearbyButton
+                  go={go}
+                  homeEyebrow11={homeEyebrow11}
+                  showEyebrow={false}
+                  salonRowStyle="zhilvinas"
+                />
+                <SearchBar
+                  value=""
+                  onChange={(value) => {
+                    setSearchValue(value);
+                    go("catalog", { category: "all" });
+                  }}
+                  onFocus={() => go("catalog", { category: "all" })}
+                  marqueePlaceholder={zhilvinasSearchMarqueePlaceholder}
+                  inputClassName={zhilvinasHeaderTrackingClass}
+                />
+              </div>
+            ) : (
+              <>
+                <SearchBar
+                  value=""
+                  onChange={(value) => {
+                    setSearchValue(value);
+                    go("catalog", { category: "all" });
+                  }}
+                  onFocus={() => go("catalog", { category: "all" })}
+                  smartRibbon={isKatyaProfile}
+                />
+                <div className="mt-3">
+                  <KatyaHomeSegmentTabs
+                    value={katyaHomeSegment}
+                    onChange={setKatyaHomeSegment}
+                    segments={katyaHomeSegments}
+                    layoutId="katya-home-segment-pill"
+                  />
+                </div>
+              </>
+            )}
           </motion.div>
         )}
         </div>
@@ -1616,17 +1809,32 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
         </div>
         )}
 
-        <section className={cx("min-w-0", isKatyaProfile ? "pb-1.5" : "pb-4")}>
+        {isZhilvinasProfile && (
+          <section className="min-w-0">
+            <HomeQuickTilesRow go={go} variant="zhilvinas" />
+          </section>
+        )}
+
+        <section
+          className={cx(
+            "min-w-0",
+            isKatyaProfile ? "pb-1.5" : "pb-0",
+            isZhilvinasProfile && "-mx-4"
+          )}
+        >
           <motion.div
             ref={promoSliderRef}
-            className="flex min-w-0 snap-x snap-proximity gap-3 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            className={cx(
+              "flex min-w-0 snap-x snap-proximity overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+              isZhilvinasProfile ? "gap-2 px-[17px]" : "gap-3"
+            )}
           >
             {promoCards.map((promo) => (
               <button
                 type="button"
                 key={promo.id}
                 onClick={() => go("catalog", { category: "all" })}
-                className="relative isolate block min-h-0 min-w-0 shrink-0 grow-0 basis-full snap-center overflow-hidden rounded-2xl bg-[#dfe3e8] aspect-[1024/498] cursor-pointer"
+                className="relative isolate block h-[130px] min-h-0 min-w-0 shrink-0 grow-0 basis-full snap-center overflow-hidden rounded-2xl bg-[#dfe3e8] cursor-pointer"
               >
                 <img
                   src={promo.image}
@@ -1669,33 +1877,23 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
         </section>
         )}
 
-        <section className={cx(isZhilvinasProfile && zhilvinasSpecialistHelpSectionClass)}>
+        {!isZhilvinasProfile && (
+        <section>
           <div className="mb-2 flex items-center justify-between px-0.5">
-            <h2 className={cx(sectionTitleClass, isZhilvinasProfile && zhilvinasSpecialistHelpTitleClass)}>
-              {isZhilvinasProfile ? "Получите помощь специалиста" : "Услуги"}
-            </h2>
+            <h2 className={sectionTitleClass}>Услуги</h2>
           </div>
-          <div className={isZhilvinasProfile ? "min-w-0" : "-mx-4"}>
-            <div
-              className={cx(
-                "flex snap-x snap-proximity gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [-ms-overflow-style:none]",
-                isZhilvinasProfile ? "scroll-px-0 pb-1" : "px-4 scroll-px-4 pb-2"
-              )}
-            >
+          <div className="-mx-4">
+            <div className="flex snap-x snap-proximity gap-3 overflow-x-auto px-4 scroll-px-4 pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             <button
               type="button"
               onClick={() => go("salons")}
-              className={cx(
-                isZhilvinasProfile
-                  ? zhilvinasSpecialistHelpCardClass
-                  : "w-[232px] shrink-0 snap-start rounded-2xl border border-[#d9ecee] bg-white p-4 text-left shadow-[0_3px_10px_rgba(0,154,166,0.06)] active:scale-[0.98] transition-transform duration-150 flex flex-col"
-              )}
+              className="w-[232px] shrink-0 snap-start rounded-2xl border border-[#d9ecee] bg-white p-4 text-left shadow-[0_3px_10px_rgba(0,154,166,0.06)] active:scale-[0.98] transition-transform duration-150 flex flex-col"
             >
-              {!isZhilvinasProfile ? <div className={cx(homeEyebrow11, "text-[#009AA6]")}>Консультация</div> : null}
+              <div className={cx(homeEyebrow11, "text-[#009AA6]")}>Консультация</div>
               <div
                 className={cx(
                   "text-sm font-semibold text-[#1c1c1c]",
-                  isZhilvinasProfile ? "leading-snug" : "mt-1.5 leading-5"
+                  "mt-1.5 leading-5"
                 )}
               >
                 Прием ортопеда
@@ -1703,7 +1901,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
               <div
                 className={cx(
                   "text-xs text-neutral-500",
-                  isZhilvinasProfile ? "leading-snug line-clamp-2" : "mt-1 leading-[1.4]"
+                  "mt-1 leading-[1.4]"
                 )}
               >
                 Осмотр и рекомендации по лечению
@@ -1712,17 +1910,13 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
             <button
               type="button"
               onClick={() => go("catalog", { category: "insoles" })}
-              className={cx(
-                isZhilvinasProfile
-                  ? zhilvinasSpecialistHelpCardClass
-                  : "w-[232px] shrink-0 snap-start rounded-2xl border border-[#d9ecee] bg-white p-4 text-left shadow-[0_3px_10px_rgba(0,154,166,0.06)] active:scale-[0.98] transition-transform duration-150 flex flex-col"
-              )}
+              className="w-[232px] shrink-0 snap-start rounded-2xl border border-[#d9ecee] bg-white p-4 text-left shadow-[0_3px_10px_rgba(0,154,166,0.06)] active:scale-[0.98] transition-transform duration-150 flex flex-col"
             >
-              {!isZhilvinasProfile ? <div className={cx(homeEyebrow11, "text-[#009AA6]")}>Диагностика стоп</div> : null}
+              <div className={cx(homeEyebrow11, "text-[#009AA6]")}>Диагностика стоп</div>
               <div
                 className={cx(
                   "text-sm font-semibold text-[#1c1c1c]",
-                  isZhilvinasProfile ? "leading-snug" : "mt-1.5 leading-5"
+                  "mt-1.5 leading-5"
                 )}
               >
                 Индивидуальные стельки
@@ -1730,7 +1924,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
               <div
                 className={cx(
                   "text-xs text-neutral-500",
-                  isZhilvinasProfile ? "leading-snug line-clamp-2" : "mt-1 leading-[1.4]"
+                  "mt-1 leading-[1.4]"
                 )}
               >
                 Подбор под ваши параметры и нагрузку
@@ -1739,17 +1933,13 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
             <button
               type="button"
               onClick={() => go("catalog", { category: "compression" })}
-              className={cx(
-                isZhilvinasProfile
-                  ? zhilvinasSpecialistHelpCardClass
-                  : "w-[232px] shrink-0 snap-start rounded-2xl border border-[#d9ecee] bg-white p-4 text-left shadow-[0_3px_10px_rgba(0,154,166,0.06)] active:scale-[0.98] transition-transform duration-150 flex flex-col"
-              )}
+              className="w-[232px] shrink-0 snap-start rounded-2xl border border-[#d9ecee] bg-white p-4 text-left shadow-[0_3px_10px_rgba(0,154,166,0.06)] active:scale-[0.98] transition-transform duration-150 flex flex-col"
             >
-              {!isZhilvinasProfile ? <div className={cx(homeEyebrow11, "text-[#009AA6]")}>Точный подбор</div> : null}
+              <div className={cx(homeEyebrow11, "text-[#009AA6]")}>Точный подбор</div>
               <div
                 className={cx(
                   "text-sm font-semibold text-[#1c1c1c]",
-                  isZhilvinasProfile ? "leading-snug" : "mt-1.5 leading-5"
+                  "mt-1.5 leading-5"
                 )}
               >
                 Компрессия по меркам
@@ -1757,7 +1947,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
               <div
                 className={cx(
                   "text-xs text-neutral-500",
-                  isZhilvinasProfile ? "leading-snug line-clamp-2" : "mt-1 leading-[1.4]"
+                  "mt-1 leading-[1.4]"
                 )}
               >
                 Заказ изделий по индивидуальным меркам
@@ -1766,11 +1956,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
             <button
               type="button"
               onClick={() => go("salons")}
-              className={cx(
-                isZhilvinasProfile
-                  ? zhilvinasSpecialistHelpMoreButtonClass
-                  : "flex w-[72px] shrink-0 snap-start flex-col items-center justify-center gap-1.5 self-stretch rounded-2xl bg-neutral-100 text-neutral-400"
-              )}
+              className="flex w-[72px] shrink-0 snap-start flex-col items-center justify-center gap-1.5 self-stretch rounded-2xl bg-neutral-100 text-neutral-400"
             >
               <ChevronRight size={16} strokeWidth={1.5} />
               <span className={cx(homeText11, "font-medium")}>Все</span>
@@ -1778,11 +1964,11 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
             </div>
           </div>
         </section>
+        )}
           </>
         )}
 
-        <section className={cx("min-w-0", isZhilvinasProfile && "space-y-2")}>
-          {isZhilvinasProfile ? <h2 className={cx(sectionTitleClass, "px-0.5")}>Для вас</h2> : null}
+        <section className="min-w-0">
           <div className="grid grid-cols-2 gap-3">
               {homeFeaturedProducts.map((product) => (
                 <button
@@ -1808,7 +1994,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                     )}
                   </div>
                   <div className="mt-2.5 text-[13px] font-normal leading-[1.3] text-[#1c1c1c] line-clamp-2">{product.title}</div>
-                  <div className="mt-1.5 text-sm font-semibold text-[#1c1c1c]">{product.price}</div>
+                  <div className="mt-1.5 text-base font-semibold text-[#1c1c1c]">{product.price}</div>
                 </button>
               ))}
               <button
