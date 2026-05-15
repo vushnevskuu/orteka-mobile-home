@@ -5,10 +5,12 @@ import {
   Bandage,
   Bell,
   Bone,
+  Calendar,
   Camera,
   Check,
   ChevronLeft,
   ChevronRight,
+  FileText,
   Footprints,
   Grid2X2,
   Heart,
@@ -217,15 +219,20 @@ const salons = [
 
 const katyaHomeQuickTiles = [
   { id: "symptoms", title: "Симптомы", category: "all", icon: Stethoscope },
+  { id: "booking", title: "Записаться", screen: "services", icon: Calendar },
+  { id: "sfr", title: "Сертификат СФР", screen: "services", icon: FileText },
+  { id: "new", title: "Новинки", category: "all", icon: Sparkles },
+  { id: "hits", title: "Хиты", category: "all", icon: Star },
   { id: "promo", title: "Акции", category: "all", icon: BadgePercent },
-  { id: "insoles", title: "Стельки", category: "insoles", icon: Footprints },
-  { id: "braces", title: "Бандажи", category: "braces", icon: Bandage },
-  { id: "orthoses", title: "Ортезы", category: "braces", icon: Bone },
-  { id: "shoes", title: "Обувь", category: "shoes", icon: SportShoe },
-  { id: "compression", title: "Трикотаж", category: "compression", icon: ShieldCheck },
 ];
 
-const homeCategories = katyaHomeQuickTiles.filter((tile) => tile.id !== "symptoms");
+const homeCategories = [
+  { id: "promo", title: "Акции", category: "all" },
+  { id: "insoles", title: "Стельки", category: "insoles" },
+  { id: "braces", title: "Бандажи", category: "braces" },
+  { id: "shoes", title: "Обувь", category: "shoes" },
+  { id: "compression", title: "Трикотаж", category: "compression" },
+];
 
 const symptomTiles = [
   { id: "back-pain", label: "Болит спина", category: "braces", query: "спина" },
@@ -590,6 +597,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
   /** Единый ритм для строк 11px на главной (без leading-tight — он визуально «сжимает» межстрочный блок). */
   const homeText11 = "text-[11px] leading-[1.45]";
   const homeEyebrow11 = `${homeText11} font-semibold uppercase tracking-[0.08em]`;
+  const katyaSalonNavTextClass = "text-[15px] font-normal leading-snug tracking-tight text-white";
   const promoSliderRef = useRef(null);
   const prioritizedOrderItems = [...homeOrderItems].sort((a, b) => {
     if (a.tone === "ready") return -1;
@@ -681,8 +689,36 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
           )}
         >
           {isKatyaHome ? (
-            <div className="flex items-center gap-1.5">
-              <button
+            homeProfileCustomer === "Катя" ? (
+              <div className="flex min-h-6 items-center justify-between gap-3 font-sans">
+                <button
+                  type="button"
+                  onClick={() => go("salons")}
+                  aria-label="Найти салон"
+                  className={cx(
+                    katyaSalonNavTextClass,
+                    "flex shrink-0 items-center gap-0.5 rounded-lg border-0 bg-transparent p-0 font-inherit text-left transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#ff8d3d]"
+                  )}
+                >
+                  <span className="font-inherit">Найти салон</span>
+                  <ChevronRight className="shrink-0 text-white opacity-95" size={17} strokeWidth={2} aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => go("salons")}
+                  aria-label="Город: Москва. Подробнее в списке салонов"
+                  className={cx(
+                    katyaSalonNavTextClass,
+                    "flex min-w-0 items-center gap-0.5 rounded-lg border-0 bg-transparent p-0 font-inherit text-left transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#ff8d3d]"
+                  )}
+                >
+                  <span className="truncate font-inherit">г. Москва</span>
+                  <ChevronRight className="shrink-0 text-white opacity-95" size={17} strokeWidth={2} aria-hidden />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5">
+                <button
                   type="button"
                   onClick={() => go("salons")}
                   aria-label="Салон рядом, г. Москва, Тверская, 12. Подробнее в списке салонов"
@@ -704,6 +740,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                   </div>
                 </button>
               </div>
+            )
           ) : (
             <div className="flex items-center justify-between gap-1.5">
               <button type="button" onClick={() => go("salons")} className="flex min-w-0 items-center gap-2 text-left">
@@ -950,7 +987,13 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                     <button
                       type="button"
                       key={tile.id}
-                      onClick={() => go("catalog", { category: tile.category })}
+                      onClick={() => {
+                        if (tile.screen) {
+                          go(tile.screen);
+                          return;
+                        }
+                        go("catalog", { category: tile.category ?? "all" });
+                      }}
                       className="flex w-[76px] shrink-0 snap-start flex-col items-center gap-2 text-center active:scale-[0.98] transition-transform duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6e00]/35 focus-visible:ring-offset-2"
                     >
                       <span className="flex w-full flex-col items-center rounded-2xl border border-[#e7e9ee] bg-white p-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
@@ -958,7 +1001,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                           <Icon className="h-6 w-6 text-[#ff6e00]" strokeWidth={2} aria-hidden />
                         </span>
                       </span>
-                      <span className="w-full text-[13px] font-normal leading-4 text-[#1c1c1c]">{tile.title}</span>
+                      <span className="w-full text-[13px] font-normal leading-4 text-[#1c1c1c] line-clamp-3">{tile.title}</span>
                     </button>
                   );
                 })}
