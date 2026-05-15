@@ -35,12 +35,31 @@ import {
   X,
 } from "lucide-react";
 import ortekaLogo from "./assets/orteka-logo.png";
+import ortekaSalonMark from "./assets/orteka-salon-mark.png";
+import cdekPvzMark from "./assets/cdek-pvz-mark.png";
 import pointsLogo from "./assets/points-logo.png";
 import pointsLogo2x from "./assets/points-logo@2x.png";
 import homeQrImage from "./assets/home-qr.png";
 import promoCompressionImage from "./assets/promo-compression.png";
 import promoInsolesImage from "./assets/promo-insoles.png";
 import promoShoesImage from "./assets/promo-shoes.png";
+import product01Image from "./assets/products/product-01.jpeg";
+import product02Image from "./assets/products/product-02.webp";
+import product03Image from "./assets/products/product-03.webp";
+import product04Image from "./assets/products/product-04.webp";
+import product05Image from "./assets/products/product-05.webp";
+import product06Image from "./assets/products/product-06.webp";
+import product07Image from "./assets/products/product-07.webp";
+import product08Image from "./assets/products/product-08.webp";
+import product09Image from "./assets/products/product-09.webp";
+import product10Image from "./assets/products/product-10.webp";
+import product11Image from "./assets/products/product-11.jpg";
+import product12Image from "./assets/products/product-12.png";
+import product13Image from "./assets/products/product-13.png";
+import product14Image from "./assets/products/product-14.jpg";
+import product15Image from "./assets/products/product-15.jpg";
+import product16Image from "./assets/products/product-16.jpg";
+import product17Image from "./assets/products/product-17.jpg";
 import tabCartFigmaIcon from "./assets/tab-cart-figma.svg";
 import tabCatalogFigmaIcon from "./assets/tab-catalog-figma.svg";
 import tabFavFigmaIcon from "./assets/tab-fav-figma.svg";
@@ -55,152 +74,271 @@ const categories = [
   { id: "compression", title: "Трикотаж", subtitle: "чулки и гольфы", icon: ShieldCheck },
   { id: "braces", title: "Бандажи", subtitle: "ортезы и фиксаторы", icon: Ruler },
   { id: "shoes", title: "Обувь", subtitle: "на каждый день", icon: ShoppingBag },
+  { id: "accessories", title: "Аксессуары", subtitle: "уход и дополнения", icon: Sparkles },
 ];
 
 const products = [
   {
     id: 1,
     category: "insoles",
-    title: "Ортопедические стельки ORTO Comfort",
-    price: "2 490 ₽",
-    oldPrice: "3 190 ₽",
+    title: "Стельки ортопедические ORTMANN Фавора (Favora)",
+    price: "4 490 ₽",
+    oldPrice: null,
     badge: "Есть рядом",
     rating: "4.8",
-    sizes: ["36", "37", "38", "39", "40", "41", "42"],
-    fit: "Для ежедневной обуви и поддержки стопы",
-    reason: "Вы часто смотрите товары для стопы",
+    sizes: ["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46"],
+    fit: "Профилактика плоскостопия и усталости стоп",
+    reason: "Сертификат СФР · код 09-01-08",
     availability: "В салоне на Тверской — сегодня",
     imageLabel: "Стельки",
+    image: product01Image,
   },
   {
     id: 2,
     category: "compression",
-    title: "Компрессионные чулки 2 класс",
-    price: "4 990 ₽",
+    title: "Чулки BAUERFEIND VenoTrain pure, 2 класс, бежевые",
+    price: "7 890 ₽",
     oldPrice: null,
     badge: "Нужен замер",
-    rating: "4.7",
+    rating: "4.9",
     sizes: ["S", "M", "L", "XL"],
-    fit: "После операции, при отёках и нагрузке на ноги",
-    reason: "Можно подобрать по вашим меркам",
+    fit: "2 класс компрессии, открытый мыс",
+    reason: "Сертификат СФР · код 08-09-20",
     availability: "В 4 салонах рядом",
-    imageLabel: "Компрессия",
+    imageLabel: "Чулки",
+    image: product02Image,
   },
   {
     id: 3,
     category: "braces",
-    title: "Ортез коленного сустава мягкой фиксации",
-    price: "3 690 ₽",
+    title: "Ортез на коленный сустав BAUERFEIND GenuTrain 8",
+    price: "15 490 ₽",
     oldPrice: null,
     badge: "Популярно",
-    rating: "4.6",
+    rating: "4.8",
     sizes: ["S", "M", "L", "XL", "XXL"],
-    fit: "Для поддержки колена при ходьбе и восстановлении",
+    fit: "Поддержка колена при нагрузке и восстановлении",
     reason: "Часто покупают после консультации",
     availability: "Доставка завтра",
     imageLabel: "Ортез",
+    image: product03Image,
   },
   {
     id: 4,
     category: "shoes",
-    title: "Ортопедическая обувь для прогулок",
-    price: "7 990 ₽",
-    oldPrice: "9 490 ₽",
+    title: "Кроссовки BERKEMANN Allegra-extra mold",
+    price: "19 990 ₽",
+    oldPrice: null,
     badge: "Примерка",
     rating: "4.9",
     sizes: ["36", "37", "38", "39", "40", "41", "42"],
-    fit: "Мягкая посадка, поддержка стопы и комфортная ходьба",
+    fit: "Ортопедические кроссовки для ежедневной ходьбы",
     reason: "Есть ваш сохранённый размер 39",
     availability: "Можно примерить в ближайшем салоне",
     imageLabel: "Обувь",
+    image: product04Image,
   },
   {
     id: 5,
     category: "braces",
-    title: "Бандаж на голеностопный сустав",
-    price: "2 190 ₽",
+    title: "Ортез голеностопный ORLETT BAN-101(M)",
+    price: "3 190 ₽",
     oldPrice: null,
     badge: "Есть рядом",
     rating: "4.7",
     sizes: ["S", "M", "L", "XL"],
-    fit: "Фиксация и поддержка при растяжении",
+    fit: "Фиксация голеностопа со стейсами",
     reason: "Подходит для активной ходьбы",
     availability: "В салоне на Тверской — сегодня",
-    imageLabel: "Бандаж",
+    imageLabel: "Ортез",
+    image: product05Image,
   },
   {
     id: 6,
     category: "compression",
-    title: "Гольфы компрессионные 1 класс",
-    price: "2 890 ₽",
-    oldPrice: "3 490 ₽",
+    title: "Гольфы VENOTEKS Classic, 2 класс, чёрные",
+    price: "957 ₽",
+    oldPrice: null,
     badge: "Нужен замер",
     rating: "4.6",
     sizes: ["S", "M", "L", "XL"],
-    fit: "Для профилактики варикоза и усталости ног",
+    fit: "2 класс компрессии, открытый мыс",
     reason: "Часто берут в пару к чулкам",
     availability: "В 3 салонах рядом",
     imageLabel: "Гольфы",
+    image: product06Image,
   },
   {
     id: 7,
     category: "insoles",
-    title: "Стельки-супинаторы ORTO Active",
-    price: "3 290 ₽",
+    title: "Ортопедические стельки ORTMANN Leader",
+    price: "6 890 ₽",
     oldPrice: null,
     badge: "Популярно",
     rating: "4.8",
     sizes: ["38", "39", "40", "41", "42", "43"],
-    fit: "Усиленная поддержка свода стопы",
+    fit: "При плоскостопии I–II степени и весе более 80 кг",
     reason: "Рекомендуют после диагностики",
     availability: "Доставка завтра",
     imageLabel: "Стельки",
+    image: product07Image,
   },
   {
     id: 8,
     category: "shoes",
-    title: "Туфли ортопедические закрытые",
-    price: "8 490 ₽",
-    oldPrice: "9 990 ₽",
+    title: "Кроссовки BERKEMANN Neolie",
+    price: "20 890 ₽",
+    oldPrice: null,
     badge: "Примерка",
     rating: "4.8",
-    sizes: ["37", "38", "39", "40", "41", "42"],
-    fit: "Для офиса и длительной ходьбы",
+    sizes: ["36", "37", "38", "39", "40", "41", "42"],
+    fit: "Ортопедические кроссовки, бежевые",
     reason: "Есть модель в вашем размере",
     availability: "Можно примерить в ближайшем салоне",
     imageLabel: "Обувь",
+    image: product08Image,
   },
   {
     id: 9,
     category: "braces",
-    title: "Наколенник с шарнирами",
-    price: "4 590 ₽",
+    title: "Ортез коленный ORLETT SO-303 Unload",
+    price: "18 190 ₽",
     oldPrice: null,
     badge: "Есть рядом",
     rating: "4.7",
     sizes: ["S", "M", "L", "XL"],
-    fit: "Стабилизация колена при нагрузке",
+    fit: "Рамный шарнирный ортез, разгрузка колена",
     reason: "Вы смотрели товары для колена",
     availability: "В салоне на Арбате — сегодня",
-    imageLabel: "Наколенник",
+    imageLabel: "Ортез",
+    image: product09Image,
   },
   {
     id: 10,
     category: "compression",
-    title: "Чулки компрессионные до бедра",
-    price: "5 490 ₽",
+    title: "Чулки BAUERFEIND VenoTrain micro, 2 класс, карамель",
+    price: "12 990 ₽",
     oldPrice: null,
     badge: "Нужен замер",
     rating: "4.9",
     sizes: ["S", "M", "L", "XL"],
-    fit: "Равномерная компрессия по всей ноге",
+    fit: "2 класс компрессии",
     reason: "Подбор по индивидуальным меркам",
     availability: "В 4 салонах рядом",
     imageLabel: "Чулки",
+    image: product10Image,
+  },
+  {
+    id: 11,
+    category: "shoes",
+    title: "Мужские ортопедические ботинки BERKEMANN Lars",
+    price: "13 645 ₽",
+    oldPrice: "27 290 ₽",
+    badge: "−50%",
+    rating: "5.0",
+    sizes: ["40", "41", "42", "43", "44", "45"],
+    fit: "Утеплённые ботинки с 5-фазной стелькой",
+    reason: "Сертификат СФР · код 09-02-05",
+    availability: "Можно примерить в ближайшем салоне",
+    imageLabel: "Ботинки",
+    image: product11Image,
+  },
+  {
+    id: 12,
+    category: "braces",
+    title: "Ортез поясничный BAUERFEIND Spinova Stabi Classic",
+    price: "73 890 ₽",
+    oldPrice: null,
+    badge: "Сертификат СФР",
+    rating: "5.0",
+    sizes: ["1", "2", "3", "4", "5", "6"],
+    fit: "Стабилизация пояснично-крестцового отдела",
+    reason: "После консультации ортопеда",
+    availability: "Доставка завтра",
+    imageLabel: "Корсет",
+    image: product12Image,
+  },
+  {
+    id: 13,
+    category: "accessories",
+    title: "Подпяточники ORTMANN SolaMed Replet",
+    price: "1 420 ₽",
+    oldPrice: null,
+    badge: "Есть рядом",
+    rating: "5.0",
+    sizes: ["S", "M", "L", "XL"],
+    fit: "Коррекция разной длины ног 3–12 мм",
+    reason: "Сертификат СФР · код 09-01-08",
+    availability: "В салоне на Тверской — сегодня",
+    imageLabel: "Подпяточники",
+    image: product13Image,
+  },
+  {
+    id: 14,
+    category: "braces",
+    title: "Ортез лучезапястный BAUERFEIND ManuTrain",
+    price: "15 790 ₽",
+    oldPrice: null,
+    badge: "Популярно",
+    rating: "5.0",
+    sizes: ["2", "3", "4", "5", "6"],
+    fit: "Поддержка запястья без жёсткой фиксации",
+    reason: "Часто берут после травмы кисти",
+    availability: "В 3 салонах рядом",
+    imageLabel: "Ортез",
+    image: product14Image,
+  },
+  {
+    id: 15,
+    category: "braces",
+    title: "Корсет поясничный ORLETT OBS-200 регулируемый",
+    price: "3 195 ₽",
+    oldPrice: null,
+    badge: "Сертификат СФР",
+    rating: "5.0",
+    sizes: ["XS", "S", "M", "L", "XL"],
+    fit: "Регулируемая фиксация поясницы",
+    reason: "Доступная цена при болях в спине",
+    availability: "Доставка завтра",
+    imageLabel: "Корсет",
+    image: product15Image,
+  },
+  {
+    id: 16,
+    category: "shoes",
+    title: "Женские ортопедические ботинки BERKEMANN Colombe",
+    price: "11 994 ₽",
+    oldPrice: null,
+    badge: "Примерка",
+    rating: "4.8",
+    sizes: ["36", "37", "38", "39", "40", "41", "42"],
+    fit: "Ботинки на липучках с 5-фазной стелькой",
+    reason: "Есть ваш сохранённый размер 39",
+    availability: "Можно примерить в ближайшем салоне",
+    imageLabel: "Ботинки",
+    image: product16Image,
+  },
+  {
+    id: 17,
+    category: "braces",
+    title: "Ортез на локтевой сустав BAUERFEIND Sports Elbow Support",
+    price: "12 390 ₽",
+    oldPrice: null,
+    badge: "Для спорта",
+    rating: "5.0",
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    fit: "Защита локтя при нагрузках",
+    reason: "Подходит для тренировок и реабилитации",
+    availability: "В 4 салонах рядом",
+    imageLabel: "Бандаж",
+    image: product17Image,
   },
 ];
 
-const homeFeaturedProducts = products.slice(0, 10);
+const homeFeaturedProductIds = [1, 11, 3, 12, 2, 5, 13, 15, 14, 6, 4, 16, 17, 9];
+const homeFeaturedProducts = homeFeaturedProductIds
+  .map((id) => products.find((product) => product.id === id))
+  .filter(Boolean);
 
 const salons = [
   {
@@ -286,7 +424,7 @@ const homeOrderItems = [
     title: "ОРТЕКА",
     address: "г. Москва, Тверская, 12",
     timing: "Заберите сегодня до 21:00",
-    image: promoInsolesImage,
+    image: product01Image,
   },
   {
     id: "pvz",
@@ -295,7 +433,7 @@ const homeOrderItems = [
     title: "ПВЗ",
     address: "г. Москва, ул. Свободы, 40",
     timing: "Приедет 16 мая · ориентир 14:00",
-    image: promoCompressionImage,
+    image: product02Image,
   },
   {
     id: "courier",
@@ -304,7 +442,7 @@ const homeOrderItems = [
     title: "Курьерская доставка",
     address: "г. Москва, ул. Свободы, 40к1, кв. 84",
     timing: "Соберём сегодня · доставка завтра, 12:00–18:00",
-    image: promoShoesImage,
+    image: product04Image,
   },
 ];
 
@@ -365,11 +503,25 @@ function HomeOrderStatusPill({ tone, label }) {
 
 function HomeOrderDeliveryKindIcon({ kind, className = "h-4 w-4 shrink-0 text-[#009AA6]" }) {
   if (kind === "salon") {
-    return <Store className={className} strokeWidth={2} aria-hidden />;
+    return (
+      <img
+        src={ortekaSalonMark}
+        alt=""
+        className={cx(className, "object-contain")}
+        aria-hidden
+      />
+    );
   }
 
   if (kind === "pvz") {
-    return <MapPin className={className} strokeWidth={2} aria-hidden />;
+    return (
+      <img
+        src={cdekPvzMark}
+        alt=""
+        className={cx(className, "object-contain")}
+        aria-hidden
+      />
+    );
   }
 
   return <Home className={className} strokeWidth={2} aria-hidden />;
@@ -384,8 +536,8 @@ const defaultSavedFilters = [
 const homeProfileCustomers = [
   { name: "Катя", disabled: false },
   { name: "Жильвинас", disabled: false },
-  { name: "В разработке", disabled: true },
-  { name: "Лёша", disabled: true },
+  { name: "В разработке", disabled: false },
+  { name: "Лёша", disabled: false },
 ];
 
 const katyaStyleHomeProfiles = new Set(["Катя", "В разработке"]);
@@ -411,7 +563,7 @@ function isLeshaLayoutBodyProfile(customerName) {
 const katyaHomeSegments = [
   { id: "home", label: "Главная" },
   { id: "med-center", label: "Медцентр" },
-  { id: "orteka-health", label: "Здоровье" },
+  { id: "orteka-health", label: "Статьи" },
 ];
 
 const zhilvinasHomeSegments = [
@@ -869,7 +1021,26 @@ function Card({ children, className = "", onClick }) {
   return <motion.div className={cx("w-full text-left bg-white rounded-2xl border border-[#e0e2e7]", className)}>{children}</motion.div>;
 }
 
-function ProductVisual({ label, large = false }) {
+function ProductVisual({ label, image, large = false }) {
+  if (image) {
+    return (
+      <div
+        className={cx(
+          "rounded-2xl bg-[#f7f8fa] overflow-hidden shrink-0 flex items-center justify-center",
+          large ? "h-64 w-full" : "w-24 h-24"
+        )}
+      >
+        <img
+          src={image}
+          alt=""
+          className={cx("h-full w-full object-contain", large ? "p-4" : "p-2")}
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    );
+  }
+
   return (
     <div
       className={cx(
@@ -887,7 +1058,7 @@ function ProductCard({ product, onOpen, compact = false }) {
   return (
     <Card onClick={() => onOpen(product)} className="p-3">
       <div className="flex gap-3">
-        <ProductVisual label={product.imageLabel} />
+        <ProductVisual label={product.imageLabel} image={product.image} />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs px-2 py-1 rounded-lg bg-[#fff3e9] text-[#ff6e00] font-medium">{product.badge}</span>
@@ -1406,12 +1577,14 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                 />
               </div>
               <div className="ml-2 flex min-w-0 flex-1 gap-2.5 rounded-2xl bg-white p-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
-                <div className="h-full w-16 shrink-0 overflow-hidden rounded-2xl bg-[#eef1f4]">
+                <div className="flex h-full w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white p-1">
                   {item.image ? (
                     <img
                       src={item.image}
                       alt=""
-                      className="block h-full w-full object-fill object-center"
+                      className="max-h-full max-w-full object-contain object-center"
+                      loading="lazy"
+                      decoding="async"
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center">
@@ -1443,8 +1616,8 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
         </div>
         )}
 
-        <section className="min-w-0 pb-4">
-          <div
+        <section className={cx("min-w-0", isKatyaProfile ? "pb-1.5" : "pb-4")}>
+          <motion.div
             ref={promoSliderRef}
             className="flex min-w-0 snap-x snap-proximity gap-3 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           >
@@ -1464,11 +1637,11 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                 <span className="sr-only">{promo.title}</span>
               </button>
             ))}
-          </div>
+          </motion.div>
         </section>
 
         {isKatyaHome && (
-          <section className="min-w-0">
+          <section className={cx("min-w-0", isKatyaProfile && "-mt-1")}>
             <HomeQuickTilesRow go={go} variant="feed" />
           </section>
         )}
@@ -1621,8 +1794,18 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                   }}
                   className="min-w-0 w-full rounded-2xl border border-[#e7e9ee] bg-white p-3 text-left shadow-[0_4px_14px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-transform duration-150"
                 >
-                  <div className="aspect-[4/5] w-full rounded-xl bg-[#fff3e9] flex items-center justify-center">
-                    <Footprints size={28} className="text-[#ff6e00]" />
+                  <div className="aspect-[4/5] w-full overflow-hidden rounded-xl bg-white flex items-center justify-center p-2">
+                    {product.image ? (
+                      <img
+                        src={product.image}
+                        alt=""
+                        className="max-h-full max-w-full object-contain"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <Footprints size={28} className="text-[#ff6e00]" />
+                    )}
                   </div>
                   <div className="mt-2.5 text-[13px] font-normal leading-[1.3] text-[#1c1c1c] line-clamp-2">{product.title}</div>
                   <div className="mt-1.5 text-sm font-semibold text-[#1c1c1c]">{product.price}</div>
@@ -1868,7 +2051,7 @@ function ProductScreen({ product, go, cartCount, setCartCount }) {
 
       <div className="px-5 space-y-4">
         <div className="relative">
-          <ProductVisual label={product.imageLabel} large />
+          <ProductVisual label={product.imageLabel} image={product.image} large />
           <button
             type="button"
             onClick={() => setFavorite((value) => !value)}
