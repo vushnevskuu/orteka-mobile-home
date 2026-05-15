@@ -351,12 +351,12 @@ const zhilvinasHomeSegments = [
 const zhilvinasSearchMarqueePlaceholder = "Спросите меня, что подойдёт при боли или травме";
 
 const zhilvinasSpecialistHelpSectionClass =
-  "rounded-2xl border border-[#c5e8eb] bg-gradient-to-br from-[#f0fafb] via-[#e8f7f9] to-[#dff0f3] p-3 shadow-[0_4px_18px_rgba(0,154,166,0.1)]";
-const zhilvinasSpecialistHelpTitleClass = "text-[#006f78]";
+  "rounded-2xl bg-[radial-gradient(ellipse_88%_72%_at_100%_0%,rgba(0,154,166,0.14)_0%,transparent_58%),linear-gradient(165deg,#f5fcfd_0%,#eaf7f9_48%,#deeff3_100%)] p-3 shadow-[0_6px_20px_rgba(0,154,166,0.09)]";
+const zhilvinasSpecialistHelpTitleClass = "text-[#007a84]";
 const zhilvinasSpecialistHelpCardClass =
-  "w-[232px] shrink-0 snap-start rounded-2xl border border-[#b5e0e6] bg-white p-3 text-left shadow-[0_3px_12px_rgba(0,122,132,0.1)] active:scale-[0.98] transition-transform duration-150 flex flex-col gap-0.5";
+  "w-[232px] shrink-0 snap-start rounded-2xl bg-white/95 p-3 text-left shadow-[0_2px_10px_rgba(0,154,166,0.08)] active:scale-[0.98] transition-transform duration-150 flex flex-col gap-0.5";
 const zhilvinasSpecialistHelpMoreButtonClass =
-  "flex w-[72px] shrink-0 snap-start flex-col items-center justify-center gap-1 self-stretch rounded-2xl border border-[#b5e0e6] bg-white/85 py-3 text-[#007a84] active:scale-[0.98] transition-transform duration-150";
+  "flex w-[72px] shrink-0 snap-start flex-col items-center justify-center gap-1 self-stretch rounded-2xl bg-white/92 py-3 text-[#009AA6] active:scale-[0.98] transition-transform duration-150";
 
 const katyaHeaderGradientClass =
   "bg-[radial-gradient(ellipse_82%_64%_at_94%_108%,#ffb35a_0%,rgba(255,104,24,0.38)_50%,transparent_72%),linear-gradient(168deg,#d95800_0%,#ff6e00_30%,#ff7a28_58%,#b84700_100%)]";
