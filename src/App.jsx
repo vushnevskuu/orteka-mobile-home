@@ -9,6 +9,7 @@ import {
   Calendar,
   Camera,
   Check,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   FileText,
@@ -665,13 +666,13 @@ function HomeSalonNearbyButton({
           <div className={cx(zhilvinasSalonRowTextClass, "flex items-center gap-1.5")}>
             <span className="w-fit shrink-0">Ближайший салон:</span>
             <span className="max-w-[5.25rem] truncate">г. Москва, Тверская, 12</span>
-            <ChevronRight className="shrink-0 text-white opacity-95" size={16} strokeWidth={2} aria-hidden />
+            <ChevronDown className="shrink-0 text-white opacity-95" size={16} strokeWidth={2} aria-hidden />
           </div>
         ) : isZhilvinasSalonRow ? (
           <div className={cx(zhilvinasSalonRowTextClass, "flex min-w-0 flex-1 items-center gap-1")}>
             <span className="w-fit shrink-0">Ближайший салон:</span>
             <span className="min-w-0 flex-1 truncate">г. Москва, Тверская, 12</span>
-            <ChevronRight
+            <ChevronDown
               className="shrink-0 text-white opacity-95 [text-shadow:none] drop-shadow-none"
               size={18}
               strokeWidth={2}
