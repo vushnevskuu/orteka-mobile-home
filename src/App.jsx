@@ -67,6 +67,14 @@ import tabCatalogFigmaIcon from "./assets/tab-catalog-figma.svg";
 import tabFavFigmaIcon from "./assets/tab-fav-figma.svg";
 import tabHomeFigmaIcon from "./assets/tab-home-figma.svg";
 import tabProfileFigmaIcon from "./assets/tab-profile-figma.svg";
+import zhilvinasBookingCalendarImage from "./assets/zhilvinas-booking-calendar.png";
+import zhilvinasTileBracesImage from "./assets/zhilvinas-tile-braces.png";
+import zhilvinasTileCompressionImage from "./assets/zhilvinas-tile-compression.png";
+import zhilvinasTileInsolesImage from "./assets/zhilvinas-tile-insoles.png";
+import zhilvinasTileNewImage from "./assets/zhilvinas-tile-new.png";
+import zhilvinasTileSleepImage from "./assets/zhilvinas-tile-sleep.png";
+import zhilvinasTilePromoImage from "./assets/zhilvinas-tile-promo.png";
+import zhilvinasTileShoesImage from "./assets/zhilvinas-tile-shoes.png";
 import { QuickTileFilledIcon } from "./components/QuickTileFilledIcons";
 
 const categories = [
@@ -375,14 +383,14 @@ const zhilvinasHeaderQuickTiles = katyaHomeQuickTiles
 
 /** Плитки каталога orteka.ru — только лента Жильвинаса (порядок как на /catalog/). */
 const zhilvinasCatalogQuickTiles = [
-  { id: "booking", title: "Записаться", screen: "services", icon: Calendar, accent: "brand" },
-  { id: "new", title: "Новинки", category: "all", icon: Sparkles },
-  { id: "ortho-goods", title: "Ортезы", category: "braces", icon: Bandage },
-  { id: "shoes", title: "Обувь", category: "shoes", icon: SportShoe },
-  { id: "compression", title: "Трикотаж", category: "compression", icon: ShieldCheck },
-  { id: "insoles-series", title: "Стельки", category: "insoles", icon: Footprints },
-  { id: "sleep", title: "Сон", category: "all", icon: Bed },
-  { id: "promo", title: "Акции", category: "all", icon: BadgePercent },
+  { id: "booking", title: "Записаться", screen: "services", image: zhilvinasBookingCalendarImage, accent: "brand" },
+  { id: "new", title: "Новинки", category: "all", image: zhilvinasTileNewImage },
+  { id: "ortho-goods", title: "Ортезы", category: "braces", image: zhilvinasTileBracesImage },
+  { id: "shoes", title: "Обувь", category: "shoes", image: zhilvinasTileShoesImage },
+  { id: "compression", title: "Трикотаж", category: "compression", image: zhilvinasTileCompressionImage },
+  { id: "insoles-series", title: "Стельки", category: "insoles", image: zhilvinasTileInsolesImage },
+  { id: "sleep", title: "Сон", category: "all", image: zhilvinasTileSleepImage },
+  { id: "promo", title: "Акции", category: "all", image: zhilvinasTilePromoImage },
 ];
 
 const homeCategories = [
@@ -601,9 +609,13 @@ const zhilvinasCatalogTileLabelClass =
   "block w-full text-center text-[12px] font-medium leading-tight text-[#1c1c1c]";
 /** CTA «Записаться» — фирменный бирюзовый, контраст с белыми плитками. */
 const zhilvinasCatalogCtaTileIconClass = `${zhilvinasCatalogTileIconBoxClass} border-0 shadow-[0_6px_16px_rgba(0,154,166,0.28)] bg-[radial-gradient(ellipse_80%_70%_at_100%_0%,rgba(255,255,255,0.22)_0%,transparent_55%),linear-gradient(155deg,#007a84_0%,#009AA6_42%,#00b0be_100%)]`;
+const zhilvinasCatalogCtaTileImageClass =
+  "mx-auto block aspect-square w-[60px] shrink-0 overflow-hidden rounded-2xl border-0 shadow-[0_6px_16px_rgba(0,154,166,0.28)]";
 const zhilvinasCatalogCtaTileLabelClass =
   "block w-full text-center text-[12px] font-semibold leading-tight text-[#007a84]";
 const zhilvinasCatalogDefaultTileIconClass = `${zhilvinasCatalogTileIconBoxClass} border border-[#e7e9ee] bg-white shadow-[0_4px_12px_rgba(0,0,0,0.04)]`;
+const zhilvinasCatalogTileImageClass =
+  "mx-auto block aspect-square w-[60px] shrink-0 overflow-hidden rounded-2xl border border-[#e7e9ee] shadow-[0_4px_12px_rgba(0,0,0,0.04)]";
 
 const katyaHeaderGradientClass =
   "bg-[radial-gradient(ellipse_82%_64%_at_94%_108%,#ffb35a_0%,rgba(255,104,24,0.38)_50%,transparent_72%),linear-gradient(168deg,#d95800_0%,#ff6e00_30%,#ff7a28_58%,#b84700_100%)]";
@@ -732,6 +744,7 @@ function HomeQuickTilesRow({ go, variant = "feed" }) {
     >
       {tiles.map((tile) => {
         const Icon = tile.icon;
+        const tileImage = tile.image;
         const isBrandCta = isZhilvinasCatalog && tile.accent === "brand";
 
         return (
@@ -770,20 +783,33 @@ function HomeQuickTilesRow({ go, variant = "feed" }) {
               <span
                 className={
                   isZhilvinasCatalog
-                    ? isBrandCta
-                      ? zhilvinasCatalogCtaTileIconClass
-                      : zhilvinasCatalogDefaultTileIconClass
+                    ? isBrandCta && tileImage
+                      ? zhilvinasCatalogCtaTileImageClass
+                      : isBrandCta
+                        ? zhilvinasCatalogCtaTileIconClass
+                        : tileImage
+                          ? zhilvinasCatalogTileImageClass
+                          : zhilvinasCatalogDefaultTileIconClass
                     : "flex h-12 w-12 w-full shrink-0 items-center justify-center rounded-2xl border border-[#e7e9ee] bg-white p-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)]"
                 }
               >
-                <Icon
-                  className={cx(
-                    isBrandCta ? "h-5 w-5 text-white" : "text-[#ff6e00]",
-                    !isBrandCta && (isZhilvinasCatalog ? "h-5 w-5" : "h-6 w-6")
-                  )}
-                  strokeWidth={isBrandCta ? 2.25 : 2}
-                  aria-hidden
-                />
+                {tileImage ? (
+                  <img
+                    src={tileImage}
+                    alt=""
+                    className="size-full object-cover object-center"
+                    draggable={false}
+                  />
+                ) : (
+                  <Icon
+                    className={cx(
+                      isBrandCta ? "h-5 w-5 text-white" : "text-[#ff6e00]",
+                      !isBrandCta && (isZhilvinasCatalog ? "h-5 w-5" : "h-6 w-6")
+                    )}
+                    strokeWidth={isBrandCta ? 2.25 : 2}
+                    aria-hidden
+                  />
+                )}
               </span>
             )}
             <span
@@ -1810,24 +1836,12 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
         </div>
         )}
 
-        {isZhilvinasProfile && (
-          <section className="min-w-0">
-            <HomeQuickTilesRow go={go} variant="zhilvinas" />
-          </section>
-        )}
-
-        <section
-          className={cx(
-            "min-w-0",
-            isKatyaProfile ? "pb-1.5" : "pb-0",
-            isZhilvinasProfile && "-mx-4"
-          )}
-        >
+        <section className={cx("min-w-0", usesHomeSegments ? "pb-0 -mx-4" : "pb-1.5")}>
           <motion.div
             ref={promoSliderRef}
             className={cx(
               "flex min-w-0 snap-x snap-proximity overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
-              isZhilvinasProfile ? "gap-2 px-[17px]" : "gap-3"
+              usesHomeSegments ? "gap-2 px-[17px]" : "gap-3"
             )}
           >
             {promoCards.map((promo) => (
@@ -1848,6 +1862,12 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
             ))}
           </motion.div>
         </section>
+
+        {isZhilvinasProfile && (
+          <section className="min-w-0">
+            <HomeQuickTilesRow go={go} variant="zhilvinas" />
+          </section>
+        )}
 
         {isKatyaHome && (
           <section className={cx("min-w-0", isKatyaProfile && "-mt-1")}>
@@ -1981,7 +2001,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                   }}
                   className="min-w-0 w-full rounded-2xl border border-[#e7e9ee] bg-white p-3 text-left shadow-[0_4px_14px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-transform duration-150"
                 >
-                  <div className="aspect-[4/5] w-full overflow-hidden rounded-xl bg-white flex items-center justify-center p-2">
+                  <div className="aspect-[4/5] w-full overflow-hidden rounded-xl bg-white flex items-center justify-center">
                     {product.image ? (
                       <img
                         src={product.image}
