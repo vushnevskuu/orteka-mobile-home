@@ -298,9 +298,16 @@ const defaultSavedFilters = [
 
 const homeProfileCustomers = [
   { name: "Катя", disabled: false },
+  { name: "В разработке", disabled: false },
   { name: "Лёша", disabled: false },
   { name: "Жильвинас", disabled: true },
 ];
+
+const katyaStyleHomeProfiles = new Set(["Катя", "В разработке"]);
+
+function isKatyaStyleHomeProfile(customerName) {
+  return katyaStyleHomeProfiles.has(customerName);
+}
 
 function cx(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -346,7 +353,7 @@ function Header({ title, subtitle, onBack, right }) {
 
 function BottomNav({ screen, go, homeProfileCustomer, setHomeProfileCustomer }) {
   const [homeProfilePickerOpen, setHomeProfilePickerOpen] = useState(false);
-  const homeTabProfileSwitch = screen === "home" && homeProfileCustomer === "Катя";
+  const homeTabProfileSwitch = screen === "home" && isKatyaStyleHomeProfile(homeProfileCustomer);
 
   useEffect(() => {
     if (!homeProfilePickerOpen) {
@@ -563,7 +570,7 @@ function ProductCard({ product, onOpen, compact = false }) {
               {product.rating}
             </span>
           </div>
-          <div className="font-semibold text-[14px] leading-tight line-clamp-2">{product.title}</div>
+          <div className="font-normal text-[14px] leading-tight line-clamp-2">{product.title}</div>
           {!compact && <div className="text-xs text-neutral-600 mt-1 line-clamp-1">{product.fit}</div>}
           <div className="flex items-end gap-2 mt-2">
             <div className="text-lg font-bold">{product.price}</div>
@@ -590,7 +597,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
     return 0;
   });
 
-  const isKatyaHome = homeProfileCustomer === "Катя";
+  const isKatyaHome = isKatyaStyleHomeProfile(homeProfileCustomer);
 
   useEffect(() => {
     const slider = promoSliderRef.current;
@@ -669,7 +676,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
           className={cx(
             "-mx-4 border-x-0 bg-[linear-gradient(135deg,#ffab6a_0%,#ffa374_12%,#ff9c68_24%,#ff945c_36%,#ff8b50_48%,#ff8244_58%,#ff7836_68%,#ff6e28_78%,#f06418_88%,#e75c00_100%)] px-4 pb-4 text-white shadow-[0_6px_14px_rgba(255,110,0,0.18)] border-b border-[#ffb57a]/40",
             isKatyaHome
-              ? "pt-[max(2rem,env(safe-area-inset-top,0px))] rounded-b-3xl border-t-0"
+              ? "pt-[max(2.75rem,calc(env(safe-area-inset-top,0px)+1rem))] sm:pt-12 rounded-b-3xl border-t-0"
               : "rounded-3xl border-t border-[#ffb57a]/40 pt-4"
           )}
         >
@@ -726,7 +733,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
             <>
               <div className="mt-3 space-y-1.5">
                 <div className="rounded-xl border border-[#ffd3b0] bg-white px-1.5 py-2 shadow-[0_3px_10px_rgba(0,0,0,0.08)]">
-                  <div className="flex min-h-[34px] items-stretch">
+                  <div className="flex min-h-[50px] items-stretch">
                     <button
                       type="button"
                       className={cx(
@@ -767,12 +774,25 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                       )}
                       aria-expanded={katyaLoyaltyTierOpen}
                       aria-controls={katyaLoyaltyTierOpen ? "home-katya-loyalty-tier" : undefined}
+                      aria-label={
+                        katyaLoyaltyTierOpen
+                          ? "Скрыть подробности о сгорании баллов"
+                          : "Подробнее о сгорании баллов"
+                      }
                       onClick={() => setKatyaLoyaltyTierOpen((open) => !open)}
                     >
                       <div className={cx(homeEyebrow11, "whitespace-nowrap text-[#ff6e00]")}>К сгоранию</div>
                       <p className="mt-0.5 whitespace-nowrap text-xs text-neutral-700 leading-snug">
                         <span className="font-semibold text-[#1c1c1c]">240</span> баллов до 30 июня
                       </p>
+                      <span
+                        className={cx(
+                          homeText11,
+                          "mt-0.5 font-medium text-[#009aa6]"
+                        )}
+                      >
+                        {katyaLoyaltyTierOpen ? "Свернуть" : "Подробнее"}
+                      </span>
                     </button>
                     <div className="ml-2.5 mr-4 h-5 w-px shrink-0 self-center bg-[#e0e2e7]" aria-hidden />
                     <button
@@ -938,7 +958,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                           <Icon className="h-6 w-6 text-[#ff6e00]" strokeWidth={2} aria-hidden />
                         </span>
                       </span>
-                      <span className="w-full text-[13px] font-semibold leading-4 text-[#1c1c1c]">{tile.title}</span>
+                      <span className="w-full text-[13px] font-normal leading-4 text-[#1c1c1c]">{tile.title}</span>
                     </button>
                   );
                 })}
@@ -1030,7 +1050,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                   <div className="aspect-[4/5] w-full rounded-xl bg-[#fff3e9] flex items-center justify-center">
                     <Footprints size={28} className="text-[#ff6e00]" />
                   </div>
-                  <div className="mt-2.5 text-[13px] font-semibold leading-[1.3] text-[#1c1c1c] line-clamp-2">{product.title}</div>
+                  <div className="mt-2.5 text-[13px] font-normal leading-[1.3] text-[#1c1c1c] line-clamp-2">{product.title}</div>
                   <div className="mt-1.5 text-sm font-semibold text-[#1c1c1c]">{product.price}</div>
                 </button>
               ))}
@@ -1052,7 +1072,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                     onClick={() => go("catalog", { category: category.category })}
                     className="w-[148px] shrink-0 snap-start rounded-2xl border border-[#e7e9ee] bg-white p-3 text-left shadow-[0_4px_12px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-transform duration-150"
                   >
-                    <div className="text-[13px] font-semibold leading-4 text-[#1c1c1c]">{category.title}</div>
+                    <div className="text-[13px] font-normal leading-4 text-[#1c1c1c]">{category.title}</div>
                   </button>
                 ))}
               </div>
@@ -1974,7 +1994,7 @@ export default function OrtekaMobilePrototype() {
   };
 
   const showBottomNav = !["product", "cart", "order", "size"].includes(screen);
-  const isKatyaHomeScreen = screen === "home" && homeProfileCustomer === "Катя";
+  const isKatyaHomeScreen = screen === "home" && isKatyaStyleHomeProfile(homeProfileCustomer);
 
   return (
     <PhoneShell>
