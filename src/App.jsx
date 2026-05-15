@@ -28,6 +28,7 @@ import {
   Sparkles,
   SportShoe,
   Star,
+  Store,
   Stethoscope,
   User,
   X,
@@ -44,6 +45,7 @@ import tabFavFigmaIcon from "./assets/tab-fav-figma.svg";
 import tabHomeFigmaIcon from "./assets/tab-home-figma.svg";
 import tabProfileFigmaIcon from "./assets/tab-profile-figma.svg";
 import tabServicesFigmaIcon from "./assets/tab-services-figma.svg";
+import { QuickTileFilledIcon } from "./components/QuickTileFilledIcons";
 
 const categories = [
   { id: "all", title: "Все", subtitle: "все товары", icon: Grid2X2 },
@@ -226,6 +228,10 @@ const katyaHomeQuickTiles = [
   { id: "promo", title: "Акции", category: "all", icon: BadgePercent },
 ];
 
+const zhilvinasHeaderQuickTiles = katyaHomeQuickTiles
+  .filter((tile) => tile.id !== "hits")
+  .map((tile) => (tile.id === "sfr" ? { ...tile, title: "СФР" } : tile));
+
 const homeCategories = [
   { id: "promo", title: "Акции", category: "all" },
   { id: "insoles", title: "Стельки", category: "insoles" },
@@ -305,15 +311,216 @@ const defaultSavedFilters = [
 
 const homeProfileCustomers = [
   { name: "Катя", disabled: false },
+  { name: "Жильвинас", disabled: false },
   { name: "В разработке", disabled: false },
   { name: "Лёша", disabled: false },
-  { name: "Жильвинас", disabled: true },
 ];
 
 const katyaStyleHomeProfiles = new Set(["Катя", "В разработке"]);
+const leshaStyleHomeProfiles = new Set(["Лёша"]);
+const zhilvinasStyleHomeProfiles = new Set(["Жильвинас"]);
 
 function isKatyaStyleHomeProfile(customerName) {
   return katyaStyleHomeProfiles.has(customerName);
+}
+
+function isLeshaStyleHomeProfile(customerName) {
+  return leshaStyleHomeProfiles.has(customerName);
+}
+
+function isZhilvinasStyleHomeProfile(customerName) {
+  return zhilvinasStyleHomeProfiles.has(customerName);
+}
+
+function isLeshaLayoutBodyProfile(customerName) {
+  return isLeshaStyleHomeProfile(customerName) || isZhilvinasStyleHomeProfile(customerName);
+}
+
+const katyaHomeSegments = [
+  { id: "home", label: "Главная" },
+  { id: "med-center", label: "Медцентр" },
+  { id: "orteka-health", label: "Здоровье" },
+];
+
+const zhilvinasHomeSegments = [
+  { id: "home", label: "Магазин" },
+  { id: "med-center", label: "Пациентам" },
+  { id: "orteka-health", label: "Врачам" },
+];
+
+const zhilvinasSearchMarqueePlaceholder = "Спросите меня, что подойдёт при боли или травме";
+
+const zhilvinasSpecialistHelpSectionClass =
+  "rounded-2xl border border-[#c5e8eb] bg-gradient-to-br from-[#f0fafb] via-[#e8f7f9] to-[#dff0f3] p-3 shadow-[0_4px_18px_rgba(0,154,166,0.1)]";
+const zhilvinasSpecialistHelpTitleClass = "text-[#006f78]";
+const zhilvinasSpecialistHelpCardClass =
+  "w-[232px] shrink-0 snap-start rounded-2xl border border-[#b5e0e6] bg-white p-3 text-left shadow-[0_3px_12px_rgba(0,122,132,0.1)] active:scale-[0.98] transition-transform duration-150 flex flex-col gap-0.5";
+const zhilvinasSpecialistHelpMoreButtonClass =
+  "flex w-[72px] shrink-0 snap-start flex-col items-center justify-center gap-1 self-stretch rounded-2xl border border-[#b5e0e6] bg-white/85 py-3 text-[#007a84] active:scale-[0.98] transition-transform duration-150";
+
+const katyaHeaderGradientClass =
+  "bg-[radial-gradient(ellipse_82%_64%_at_94%_108%,#ffb35a_0%,rgba(255,104,24,0.38)_50%,transparent_72%),linear-gradient(168deg,#d95800_0%,#ff6e00_30%,#ff7a28_58%,#b84700_100%)]";
+
+const katyaHeaderShellEdgeClass = "border-white/20";
+const katyaHeaderShellShadowClass = "shadow-[0_8px_22px_rgba(184,71,0,0.26)]";
+const katyaHeaderStickySurfaceClass =
+  "bg-[linear-gradient(168deg,#ff6e00_0%,#f06810_38%,#c44f00_100%)]";
+const katyaHeaderFocusRingOffsetClass = "focus-visible:ring-offset-[#e35f00]";
+
+const zhilvinasUnifiedHeaderShellClass = cx(
+  katyaHeaderGradientClass,
+  "-mx-4 flex flex-col overflow-hidden rounded-b-3xl border-b",
+  katyaHeaderShellEdgeClass,
+  katyaHeaderShellShadowClass
+);
+
+function HomeSalonNearbyButton({ go, homeEyebrow11, showEyebrow = true }) {
+  return (
+    <div className="flex w-full items-center gap-2">
+      <button
+        type="button"
+        onClick={() => go("salons")}
+        aria-label={
+          showEyebrow
+            ? "Салон рядом, г. Москва, Тверская, 12. Подробнее в списке салонов"
+            : "г. Москва, Тверская, 12. Подробнее в списке салонов"
+        }
+        className={cx(
+          "flex min-w-0 flex-1 flex-col justify-center rounded-xl px-0.5 py-1 text-left transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2",
+          katyaHeaderFocusRingOffsetClass,
+          showEyebrow ? "gap-1.5" : "gap-0"
+        )}
+      >
+        {showEyebrow ? (
+          <div className={cx(homeEyebrow11, "text-white/90 [text-shadow:none] shadow-none")}>Салон рядом</div>
+        ) : null}
+        <div className="flex min-w-0 w-full items-center justify-start gap-2">
+          {!showEyebrow ? (
+            <Store className="h-5 w-5 shrink-0 text-white" strokeWidth={2} aria-hidden />
+          ) : null}
+          <div className="flex min-w-0 flex-1 items-center gap-0.5">
+            <span className="min-w-0 truncate text-[15px] font-semibold leading-snug tracking-tight text-white [text-shadow:none] shadow-none">
+              г. Москва, Тверская, 12
+            </span>
+            <ChevronRight
+              className="shrink-0 -ml-px text-white opacity-95 [text-shadow:none] drop-shadow-none"
+              size={20}
+              strokeWidth={2}
+              aria-hidden
+            />
+          </div>
+        </div>
+      </button>
+      {!showEyebrow ? (
+        <div
+          className="shrink-0 rounded-xl bg-white px-2 py-1 text-sm font-semibold text-[#ff6e00] flex items-center gap-1"
+          aria-label="Баллы: 1 240"
+        >
+          <span aria-hidden>1 240</span>
+          <img src={pointsLogo} alt="" className="h-3 w-3" aria-hidden />
+        </div>
+      ) : null}
+    </div>
+  );
+}
+function HomeQuickTilesRow({ go, variant = "feed" }) {
+  const isHeader = variant === "header";
+  const tiles = isHeader ? zhilvinasHeaderQuickTiles : katyaHomeQuickTiles;
+
+  return (
+    <div
+      className={cx(
+        "-mx-4 px-4",
+        isHeader
+          ? "mt-3 grid grid-cols-5 gap-1"
+          : "flex snap-x snap-proximity gap-2.5 overflow-x-auto scroll-px-4 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+      )}
+    >
+      {tiles.map((tile) => {
+        const Icon = tile.icon;
+
+        return (
+          <button
+            type="button"
+            key={tile.id}
+            onClick={() => {
+              if (tile.screen) {
+                go(tile.screen);
+                return;
+              }
+              go("catalog", { category: tile.category ?? "all" });
+            }}
+            className={cx(
+              "flex flex-col items-center text-center active:scale-[0.98] transition-transform duration-150",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2",
+              katyaHeaderFocusRingOffsetClass,
+              isHeader ? "min-w-0 gap-1.5" : "w-[76px] shrink-0 snap-start gap-2"
+            )}
+          >
+            {isHeader ? (
+              <span className="flex h-8 w-8 items-center justify-center text-white">
+                <QuickTileFilledIcon tileId={tile.id} />
+              </span>
+            ) : (
+              <span className="flex h-12 w-12 w-full items-center justify-center rounded-2xl border border-[#e7e9ee] bg-white p-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
+                <Icon className="h-6 w-6 text-[#ff6e00]" strokeWidth={2} aria-hidden />
+              </span>
+            )}
+            <span
+              className={cx(
+                "w-full line-clamp-2",
+                isHeader
+                  ? "text-[11px] font-medium leading-[1.2] tracking-tight text-white"
+                  : "text-[13px] font-normal leading-4 text-[#1c1c1c]"
+              )}
+            >
+              {tile.title}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function KatyaHomeSegmentTabs({ value, onChange, layoutId = "katya-home-segment-pill", segments = katyaHomeSegments }) {
+  return (
+    <motion.div
+      role="tablist"
+      aria-label="Разделы главной"
+      className="mt-3 flex gap-0.5 rounded-2xl bg-[#b84700]/28 p-1 ring-1 ring-inset ring-white/30 backdrop-blur-[3px]"
+    >
+      {segments.map((segment) => {
+        const active = value === segment.id;
+
+        return (
+          <motion.button
+            key={segment.id}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            onClick={() => onChange(segment.id)}
+            className={cx(
+              "relative z-0 flex min-h-9 min-w-0 flex-1 items-center justify-center rounded-[10px] px-2 py-2",
+              "text-[11px] font-semibold leading-none tracking-tight transition-colors duration-200",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2",
+              katyaHeaderFocusRingOffsetClass,
+              active ? "text-[#1c1c1c]" : "text-white/90 hover:text-white"
+            )}
+          >
+            {active && (
+              <motion.span
+                layoutId={layoutId}
+                className="absolute inset-0 rounded-[10px] bg-white shadow-[0_2px_10px_rgba(0,0,0,0.14)]"
+                transition={{ type: "spring", stiffness: 520, damping: 36 }}
+              />
+            )}
+            <span className="relative z-10 truncate">{segment.label}</span>
+          </motion.button>
+        );
+      })}
+    </motion.div>
+  );
 }
 
 function cx(...classes) {
@@ -360,7 +567,7 @@ function Header({ title, subtitle, onBack, right }) {
 
 function BottomNav({ screen, go, homeProfileCustomer, setHomeProfileCustomer }) {
   const [homeProfilePickerOpen, setHomeProfilePickerOpen] = useState(false);
-  const homeTabProfileSwitch = screen === "home" && isKatyaStyleHomeProfile(homeProfileCustomer);
+  const homeTabProfileSwitch = screen === "home";
 
   useEffect(() => {
     if (!homeProfilePickerOpen) {
@@ -383,10 +590,14 @@ function BottomNav({ screen, go, homeProfileCustomer, setHomeProfileCustomer }) 
     }
   }, [screen]);
 
+  const showServicesTab = homeProfileCustomer === "Катя";
+
   const items = [
     { id: "home", title: "Главная", image: tabHomeFigmaIcon, width: 34, height: 24, action: () => go("home") },
     { id: "catalog", title: "Каталог", image: tabCatalogFigmaIcon, width: 24, height: 24, action: () => go("catalog", { category: "all" }) },
-    { id: "services", title: "Услуги", image: tabServicesFigmaIcon, width: 24, height: 24, action: () => go("services") },
+    ...(showServicesTab
+      ? [{ id: "services", title: "Услуги", image: tabServicesFigmaIcon, width: 24, height: 24, action: () => go("services") }]
+      : []),
     { id: "cart", title: "Корзина", image: tabCartFigmaIcon, width: 24, height: 24, action: () => go("cart") },
     { id: "favorites", title: "Избранное", image: tabFavFigmaIcon, width: 24, height: 24, action: () => go("favorites") },
     { id: "profile", title: "Профиль", image: tabProfileFigmaIcon, width: 24, height: 24, action: () => go("profile") },
@@ -488,7 +699,24 @@ function BottomNav({ screen, go, homeProfileCustomer, setHomeProfileCustomer }) 
   );
 }
 
-function SearchBar({ value, onChange, onFocus, smartRibbon }) {
+function SearchBar({ value, onChange, onFocus, smartRibbon, marqueePlaceholder }) {
+  const [isFocused, setIsFocused] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const syncMotionPreference = () => setPrefersReducedMotion(media.matches);
+    syncMotionPreference();
+    media.addEventListener("change", syncMotionPreference);
+    return () => media.removeEventListener("change", syncMotionPreference);
+  }, []);
+
+  const defaultPlaceholder = smartRibbon
+    ? "Умный поиск — размер, подсказки и наличие рядом"
+    : "Найти стельки, бандаж, ортез или обувь";
+  const placeholderText = marqueePlaceholder ?? defaultPlaceholder;
+  const showMarquee = Boolean(marqueePlaceholder) && !value && !isFocused && !prefersReducedMotion;
+
   return (
     <div className="relative">
       <Search
@@ -498,20 +726,43 @@ function SearchBar({ value, onChange, onFocus, smartRibbon }) {
       <input
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        onFocus={onFocus}
-        placeholder={
-          smartRibbon
-            ? "Умный поиск — размер, подсказки и наличие рядом"
-            : "Найти стельки, бандаж, ортез или обувь"
-        }
-        title={
-          smartRibbon
-            ? "Умный поиск — размер, подсказки и наличие рядом"
-            : "Найти стельки, бандаж, ортез или обувь"
-        }
-        className="orteka-search-input min-w-0 w-full h-11 overflow-hidden text-ellipsis whitespace-nowrap rounded-xl border border-[#e0e2e7] bg-white pl-12 pr-12 text-base text-[#1c1c1c] outline-none placeholder:text-neutral-500 focus:ring-2 focus:ring-[#ff6e00]/30"
-        aria-label={smartRibbon ? "Умный поиск по каталогу" : undefined}
+        onFocus={() => {
+          setIsFocused(true);
+          onFocus?.();
+        }}
+        onBlur={() => setIsFocused(false)}
+        placeholder={showMarquee ? "" : placeholderText}
+        title={placeholderText}
+        className={cx(
+          "orteka-search-input min-w-0 w-full h-11 overflow-hidden text-ellipsis whitespace-nowrap rounded-xl border border-[#e0e2e7] bg-white pl-12 text-base text-[#1c1c1c] outline-none placeholder:text-neutral-500 focus:ring-2 focus:ring-[#ff6e00]/30",
+          smartRibbon ? "pr-[4.75rem]" : "pr-12"
+        )}
+        aria-label={smartRibbon || marqueePlaceholder ? placeholderText : undefined}
       />
+      {showMarquee ? (
+        <div
+          className="pointer-events-none absolute inset-y-0 left-12 right-12 flex items-center overflow-hidden"
+          aria-hidden
+        >
+          <div className="orteka-search-marquee-track flex w-max items-center">
+            <span className="orteka-search-marquee-copy whitespace-nowrap pr-10 text-base text-neutral-500">
+              {marqueePlaceholder}
+            </span>
+            <span className="orteka-search-marquee-copy whitespace-nowrap pr-10 text-base text-neutral-500" aria-hidden>
+              {marqueePlaceholder}
+            </span>
+          </div>
+        </div>
+      ) : null}
+      {smartRibbon && (
+        <button
+          type="button"
+          aria-label="Умные подсказки ИИ"
+          className="absolute right-11 top-1/2 -translate-y-1/2 text-[#ff6e00]/85 transition-colors hover:text-[#ff6e00] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6e00]/35 focus-visible:ring-offset-2 rounded-md"
+        >
+          <Sparkles size={18} strokeWidth={2} aria-hidden />
+        </button>
+      )}
       <button
         type="button"
         aria-label="Поиск по фото"
@@ -593,6 +844,9 @@ function ProductCard({ product, onOpen, compact = false }) {
 function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustomer, setHomeProfileCustomer }) {
   const [customerMenuOpen, setCustomerMenuOpen] = useState(false);
   const [katyaLoyaltyTierOpen, setKatyaLoyaltyTierOpen] = useState(true);
+  const [katyaHomeSegment, setKatyaHomeSegment] = useState("home");
+  const [katyaStickyPinned, setKatyaStickyPinned] = useState(false);
+  const katyaStickySearchRef = useRef(null);
   const sectionTitleClass = "text-[15px] font-semibold text-[#1c1c1c]";
   /** Единый ритм для строк 11px на главной (без leading-tight — он визуально «сжимает» межстрочный блок). */
   const homeText11 = "text-[11px] leading-[1.45]";
@@ -606,6 +860,38 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
   });
 
   const isKatyaHome = isKatyaStyleHomeProfile(homeProfileCustomer);
+  const isLeshaProfile = isLeshaStyleHomeProfile(homeProfileCustomer);
+  const isZhilvinasProfile = isZhilvinasStyleHomeProfile(homeProfileCustomer);
+  const isLeshaLayoutBody = isLeshaLayoutBodyProfile(homeProfileCustomer);
+  const isKatyaFlatHeader = isKatyaHome || isZhilvinasProfile;
+  const isKatyaProfile = homeProfileCustomer === "Катя";
+  const usesHomeSegments = isKatyaProfile || isZhilvinasProfile;
+  const isKatyaHomeSegment = !usesHomeSegments || katyaHomeSegment === "home";
+
+  useEffect(() => {
+    if (!usesHomeSegments && katyaHomeSegment !== "home") {
+      setKatyaHomeSegment("home");
+    }
+  }, [usesHomeSegments, katyaHomeSegment]);
+
+  useEffect(() => {
+    if (!usesHomeSegments) {
+      setKatyaStickyPinned(false);
+      return undefined;
+    }
+
+    const node = katyaStickySearchRef.current;
+    if (!node) {
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setKatyaStickyPinned(entry.intersectionRatio < 1),
+      { threshold: [1] }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [usesHomeSegments]);
 
   useEffect(() => {
     const slider = promoSliderRef.current;
@@ -627,10 +913,10 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
       <div
         className={cx(
           "px-4 pb-4 flex flex-col gap-4",
-          isKatyaHome ? "pt-0" : "pt-4"
+          isKatyaFlatHeader ? "pt-0" : "pt-4"
         )}
       >
-        {!isKatyaHome && (
+        {isLeshaProfile && (
           <div className="flex items-center justify-between">
             <div className="relative">
               <button
@@ -680,16 +966,36 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
           </div>
         )}
 
+        <div
+          className={cx(
+            isZhilvinasProfile && usesHomeSegments && zhilvinasUnifiedHeaderShellClass,
+            !(isZhilvinasProfile && usesHomeSegments) && "contents"
+          )}
+        >
         <section
           className={cx(
-            "-mx-4 border-x-0 bg-[linear-gradient(135deg,#ffab6a_0%,#ffa374_12%,#ff9c68_24%,#ff945c_36%,#ff8b50_48%,#ff8244_58%,#ff7836_68%,#ff6e28_78%,#f06418_88%,#e75c00_100%)] px-4 pb-4 text-white shadow-[0_6px_14px_rgba(255,110,0,0.18)] border-b border-[#ffb57a]/40",
-            isKatyaHome
-              ? "pt-[max(2.75rem,calc(env(safe-area-inset-top,0px)+1rem))] sm:pt-12 rounded-b-3xl border-t-0"
-              : "rounded-3xl border-t border-[#ffb57a]/40 pt-4"
+            isKatyaProfile
+              ? cx(
+                  "-mx-4 border-0 px-4 pb-0 pt-[max(2.75rem,calc(env(safe-area-inset-top,0px)+1rem))] text-white sm:pt-12",
+                  katyaHeaderGradientClass
+                )
+              : isZhilvinasProfile && usesHomeSegments
+                ? "border-0 bg-transparent px-4 pb-1 pt-[max(2.75rem,calc(env(safe-area-inset-top,0px)+1rem))] text-white"
+                : cx(
+                    "-mx-4 border-x-0 border-b px-4 text-white",
+                    katyaHeaderGradientClass,
+                    katyaHeaderShellEdgeClass,
+                    isKatyaFlatHeader
+                      ? cx(
+                          "border-t-0 pt-[max(2.75rem,calc(env(safe-area-inset-top,0px)+1rem))] sm:pt-12",
+                          isZhilvinasProfile ? "pb-4" : "pb-0"
+                        )
+                      : cx("rounded-3xl border-t pt-4 pb-4", katyaHeaderShellShadowClass)
+                  )
           )}
         >
           {isKatyaHome ? (
-            homeProfileCustomer === "Катя" ? (
+            isKatyaProfile ? (
               <div className="flex min-h-6 items-center justify-between gap-3 font-sans">
                 <button
                   type="button"
@@ -697,7 +1003,8 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                   aria-label="Найти салон"
                   className={cx(
                     katyaSalonNavTextClass,
-                    "flex shrink-0 items-center gap-0.5 rounded-lg border-0 bg-transparent p-0 font-inherit text-left transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#ff8d3d]"
+                    "flex shrink-0 items-center gap-0.5 rounded-lg border-0 bg-transparent p-0 font-inherit text-left transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2",
+                    katyaHeaderFocusRingOffsetClass
                   )}
                 >
                   <span className="font-inherit">Найти салон</span>
@@ -709,7 +1016,8 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                   aria-label="Город: Москва. Подробнее в списке салонов"
                   className={cx(
                     katyaSalonNavTextClass,
-                    "flex min-w-0 items-center gap-0.5 rounded-lg border-0 bg-transparent p-0 font-inherit text-left transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#ff8d3d]"
+                    "flex min-w-0 items-center gap-0.5 rounded-lg border-0 bg-transparent p-0 font-inherit text-left transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2",
+                    katyaHeaderFocusRingOffsetClass
                   )}
                 >
                   <span className="truncate font-inherit">г. Москва</span>
@@ -717,30 +1025,10 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => go("salons")}
-                  aria-label="Салон рядом, г. Москва, Тверская, 12. Подробнее в списке салонов"
-                  className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 rounded-xl px-0.5 py-1 text-left transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#ff8d3d]"
-                >
-                  <div className={cx(homeEyebrow11, "text-white/90 [text-shadow:none] shadow-none")}>
-                    Салон рядом
-                  </div>
-                  <div className="flex min-w-0 w-full items-center justify-start gap-0">
-                    <span className="min-w-0 max-w-[calc(100%-1.375rem)] truncate text-[15px] font-semibold leading-snug tracking-tight text-white [text-shadow:none] shadow-none">
-                      г. Москва, Тверская, 12
-                    </span>
-                    <ChevronRight
-                      className="shrink-0 -ml-px text-white opacity-95 [text-shadow:none] drop-shadow-none"
-                      size={20}
-                      strokeWidth={2}
-                      aria-hidden
-                    />
-                  </div>
-                </button>
-              </div>
+              <HomeSalonNearbyButton go={go} homeEyebrow11={homeEyebrow11} />
             )
+          ) : isZhilvinasProfile ? (
+            <HomeSalonNearbyButton go={go} homeEyebrow11={homeEyebrow11} showEyebrow={false} />
           ) : (
             <div className="flex items-center justify-between gap-1.5">
               <button type="button" onClick={() => go("salons")} className="flex min-w-0 items-center gap-2 text-left">
@@ -754,22 +1042,23 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
             </div>
           )}
 
-          <div className="mt-3">
-            <SearchBar
-              value=""
-              onChange={(value) => {
-                setSearchValue(value);
-                go("catalog", { category: "all" });
-              }}
-              onFocus={() => go("catalog", { category: "all" })}
-              smartRibbon={isKatyaHome}
-            />
-          </div>
+          {isKatyaHome && !isKatyaProfile && (
+            <div className="mt-3">
+              <SearchBar
+                value=""
+                onChange={(value) => {
+                  setSearchValue(value);
+                  go("catalog", { category: "all" });
+                }}
+                onFocus={() => go("catalog", { category: "all" })}
+                smartRibbon
+              />
+            </div>
+          )}
 
-          {isKatyaHome ? (
-            <>
-              <div className="mt-3 space-y-1.5">
-                <div className="rounded-xl border border-[#ffd3b0] bg-white px-1.5 py-2 shadow-[0_3px_10px_rgba(0,0,0,0.08)]">
+          {isKatyaHome && (
+              <div className={cx("mt-3 space-y-1.5", !isKatyaProfile && "pb-4")}>
+                <div className="flex flex-col gap-1.5 overflow-hidden rounded-xl border border-[#ffd3b0] bg-white px-1.5 py-2 shadow-[0_3px_10px_rgba(0,0,0,0.08)]">
                   <div className="flex min-h-[50px] items-stretch">
                     <button
                       type="button"
@@ -848,7 +1137,6 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                     </button>
                   </div>
                   {katyaLoyaltyTierOpen ? (
-                    <div className="mt-1.5 pt-1.5">
                       <div
                         id="home-katya-loyalty-tier"
                         className="rounded-xl bg-white p-2.5 space-y-2 shadow-[0_2px_10px_rgba(15,23,42,0.06)]"
@@ -877,13 +1165,25 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                           </p>
                         </div>
                       </div>
-                    </div>
                   ) : null}
                 </div>
               </div>
-            </>
-          ) : (
-            <div className="mt-3 grid grid-cols-2 gap-1.5">
+          )}
+
+
+          {isLeshaProfile && (
+            <>
+              <div className="mt-3">
+                <SearchBar
+                  value=""
+                  onChange={(value) => {
+                    setSearchValue(value);
+                    go("catalog", { category: "all" });
+                  }}
+                  onFocus={() => go("catalog", { category: "all" })}
+                />
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-1.5">
               <button
                 type="button"
                 onClick={() => go("salons")}
@@ -909,9 +1209,107 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                 </div>
               </button>
             </div>
+            </>
           )}
+
+          {isZhilvinasProfile && <HomeQuickTilesRow go={go} variant="header" />}
         </section>
 
+        {usesHomeSegments && (
+          <motion.div
+            ref={katyaStickySearchRef}
+            className={cx(
+              isZhilvinasProfile
+                ? cx(
+                    "sticky top-0 z-40 px-4 pb-4 pt-3",
+                    katyaStickyPinned
+                      ? cx(
+                          katyaHeaderStickySurfaceClass,
+                          "border-b rounded-b-3xl",
+                          katyaHeaderShellEdgeClass,
+                          katyaHeaderShellShadowClass
+                        )
+                      : "bg-transparent"
+                  )
+                : cx(
+                    katyaHeaderGradientClass,
+                    "sticky top-0 z-40 -mx-4 -mt-4 px-4 pb-4",
+                    katyaStickyPinned
+                      ? "pt-[max(1rem,calc(env(safe-area-inset-top,0px)+0.75rem))] sm:pt-16"
+                      : "pt-4",
+                    cx("border-b rounded-b-3xl", katyaHeaderShellEdgeClass, katyaHeaderShellShadowClass)
+                  )
+            )}
+          >
+            <SearchBar
+              value=""
+              onChange={(value) => {
+                setSearchValue(value);
+                go("catalog", { category: "all" });
+              }}
+              onFocus={() => go("catalog", { category: "all" })}
+              smartRibbon={isKatyaProfile}
+              marqueePlaceholder={isZhilvinasProfile ? zhilvinasSearchMarqueePlaceholder : undefined}
+            />
+            <KatyaHomeSegmentTabs
+              value={katyaHomeSegment}
+              onChange={setKatyaHomeSegment}
+              segments={isZhilvinasProfile ? zhilvinasHomeSegments : katyaHomeSegments}
+              layoutId={isZhilvinasProfile ? "zhilvinas-home-segment-pill" : "katya-home-segment-pill"}
+            />
+          </motion.div>
+        )}
+        </div>
+
+        {usesHomeSegments && katyaHomeSegment === "med-center" && (
+          <section className="min-w-0 space-y-3">
+            <p className={cx(homeText11, "px-0.5 text-neutral-600")}>
+              Запись, консультации и диагностика в медицинском центре Ортека.
+            </p>
+            <div className="-mx-4">
+              <div className="flex snap-x snap-proximity gap-3 overflow-x-auto px-4 pb-1 scroll-px-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                <button
+                  type="button"
+                  onClick={() => go("salons")}
+                  className="w-[232px] shrink-0 snap-start rounded-2xl border border-[#d9ecee] bg-white p-4 text-left shadow-[0_3px_10px_rgba(0,154,166,0.06)] active:scale-[0.98] transition-transform duration-150 flex flex-col"
+                >
+                  <div className={cx(homeEyebrow11, "text-[#009AA6]")}>Консультация</div>
+                  <div className="mt-1.5 text-sm font-semibold leading-5 text-[#1c1c1c]">Прием ортопеда</div>
+                  <div className="mt-1 text-xs text-neutral-500 leading-[1.4]">Осмотр и рекомендации по лечению</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => go("catalog", { category: "insoles" })}
+                  className="w-[232px] shrink-0 snap-start rounded-2xl border border-[#d9ecee] bg-white p-4 text-left shadow-[0_3px_10px_rgba(0,154,166,0.06)] active:scale-[0.98] transition-transform duration-150 flex flex-col"
+                >
+                  <div className={cx(homeEyebrow11, "text-[#009AA6]")}>Диагностика стоп</div>
+                  <div className="mt-1.5 text-sm font-semibold leading-5 text-[#1c1c1c]">Индивидуальные стельки</div>
+                  <div className="mt-1 text-xs text-neutral-500 leading-[1.4]">Подбор под ваши параметры и нагрузку</div>
+                </button>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => go("services")}
+              className="flex h-12 w-full items-center justify-center rounded-2xl border border-[#e7e9ee] bg-white text-sm font-semibold text-[#1c1c1c] shadow-[0_4px_14px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-transform duration-150"
+            >
+              Все услуги
+            </button>
+          </section>
+        )}
+
+        {usesHomeSegments && katyaHomeSegment === "orteka-health" && (
+          <section className="min-w-0 rounded-2xl border border-[#e7e9ee] bg-white p-6 text-center shadow-[0_4px_14px_rgba(0,0,0,0.04)]">
+            <p className="text-[15px] font-semibold text-[#1c1c1c]">Ортека.Здоровье</p>
+            <p className="mt-2 text-sm leading-relaxed text-neutral-600">
+              Статьи, рекомендации и программы заботы о здоровье — раздел в разработке.
+            </p>
+          </section>
+        )}
+
+        {isKatyaHomeSegment && (
+        <>
+        {!isZhilvinasProfile && (
         <div className="-mx-4">
           <div className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [-ms-overflow-style:none]">
           {prioritizedOrderItems.map((item) => (
@@ -952,6 +1350,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
           ))}
           </div>
         </div>
+        )}
 
         <section className="min-w-0 pb-4">
           <div
@@ -979,39 +1378,13 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
 
         {isKatyaHome && (
           <section className="min-w-0">
-            <div className="-mx-4">
-              <div className="flex snap-x snap-proximity gap-3 overflow-x-auto px-4 pb-1 scroll-px-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-                {katyaHomeQuickTiles.map((tile) => {
-                  const Icon = tile.icon;
-                  return (
-                    <button
-                      type="button"
-                      key={tile.id}
-                      onClick={() => {
-                        if (tile.screen) {
-                          go(tile.screen);
-                          return;
-                        }
-                        go("catalog", { category: tile.category ?? "all" });
-                      }}
-                      className="flex w-[76px] shrink-0 snap-start flex-col items-center gap-2 text-center active:scale-[0.98] transition-transform duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6e00]/35 focus-visible:ring-offset-2"
-                    >
-                      <span className="flex w-full flex-col items-center rounded-2xl border border-[#e7e9ee] bg-white p-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
-                        <span className="flex h-12 w-12 items-center justify-center">
-                          <Icon className="h-6 w-6 text-[#ff6e00]" strokeWidth={2} aria-hidden />
-                        </span>
-                      </span>
-                      <span className="w-full text-[13px] font-normal leading-4 text-[#1c1c1c] line-clamp-3">{tile.title}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            <HomeQuickTilesRow go={go} variant="feed" />
           </section>
         )}
 
-        {!isKatyaHome && (
+        {isLeshaLayoutBody && (
           <>
+        {!isZhilvinasProfile && (
         <section className="space-y-2">
           <h2 className={sectionTitleClass}>Симптомы</h2>
           <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 scroll-px-4 [scrollbar-width:none] [-ms-overflow-style:none]">
@@ -1030,44 +1403,110 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
             ))}
           </div>
         </section>
+        )}
 
-        <section>
-          <div className="mb-2 flex items-center justify-between">
-            <h2 className={sectionTitleClass}>Услуги</h2>
+        <section className={cx(isZhilvinasProfile && zhilvinasSpecialistHelpSectionClass)}>
+          <div className="mb-2 flex items-center justify-between px-0.5">
+            <h2 className={cx(sectionTitleClass, isZhilvinasProfile && zhilvinasSpecialistHelpTitleClass)}>
+              {isZhilvinasProfile ? "Получите помощь специалиста" : "Услуги"}
+            </h2>
           </div>
-          <div className="-mx-4">
-            <div className="flex snap-x snap-proximity gap-3 overflow-x-auto px-4 pb-2 scroll-px-4 [scrollbar-width:none] [-ms-overflow-style:none]">
+          <div className={isZhilvinasProfile ? "min-w-0" : "-mx-4"}>
+            <div
+              className={cx(
+                "flex snap-x snap-proximity gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [-ms-overflow-style:none]",
+                isZhilvinasProfile ? "scroll-px-0 pb-1" : "px-4 scroll-px-4 pb-2"
+              )}
+            >
             <button
               type="button"
               onClick={() => go("salons")}
-              className="w-[232px] shrink-0 snap-start rounded-2xl border border-[#d9ecee] bg-white p-4 text-left shadow-[0_3px_10px_rgba(0,154,166,0.06)] active:scale-[0.98] transition-transform duration-150 flex flex-col"
+              className={cx(
+                isZhilvinasProfile
+                  ? zhilvinasSpecialistHelpCardClass
+                  : "w-[232px] shrink-0 snap-start rounded-2xl border border-[#d9ecee] bg-white p-4 text-left shadow-[0_3px_10px_rgba(0,154,166,0.06)] active:scale-[0.98] transition-transform duration-150 flex flex-col"
+              )}
             >
-              <div className={cx(homeEyebrow11, "text-[#009AA6]")}>Консультация</div>
-              <div className="mt-1.5 text-sm font-semibold leading-5 text-[#1c1c1c]">Прием ортопеда</div>
-              <div className="mt-1 text-xs text-neutral-500 leading-[1.4]">Осмотр и рекомендации по лечению</div>
+              {!isZhilvinasProfile ? <div className={cx(homeEyebrow11, "text-[#009AA6]")}>Консультация</div> : null}
+              <div
+                className={cx(
+                  "text-sm font-semibold text-[#1c1c1c]",
+                  isZhilvinasProfile ? "leading-snug" : "mt-1.5 leading-5"
+                )}
+              >
+                Прием ортопеда
+              </div>
+              <div
+                className={cx(
+                  "text-xs text-neutral-500",
+                  isZhilvinasProfile ? "leading-snug line-clamp-2" : "mt-1 leading-[1.4]"
+                )}
+              >
+                Осмотр и рекомендации по лечению
+              </div>
             </button>
             <button
               type="button"
               onClick={() => go("catalog", { category: "insoles" })}
-              className="w-[232px] shrink-0 snap-start rounded-2xl border border-[#d9ecee] bg-white p-4 text-left shadow-[0_3px_10px_rgba(0,154,166,0.06)] active:scale-[0.98] transition-transform duration-150 flex flex-col"
+              className={cx(
+                isZhilvinasProfile
+                  ? zhilvinasSpecialistHelpCardClass
+                  : "w-[232px] shrink-0 snap-start rounded-2xl border border-[#d9ecee] bg-white p-4 text-left shadow-[0_3px_10px_rgba(0,154,166,0.06)] active:scale-[0.98] transition-transform duration-150 flex flex-col"
+              )}
             >
-              <div className={cx(homeEyebrow11, "text-[#009AA6]")}>Диагностика стоп</div>
-              <div className="mt-1.5 text-sm font-semibold leading-5 text-[#1c1c1c]">Индивидуальные стельки</div>
-              <div className="mt-1 text-xs text-neutral-500 leading-[1.4]">Подбор под ваши параметры и нагрузку</div>
+              {!isZhilvinasProfile ? <div className={cx(homeEyebrow11, "text-[#009AA6]")}>Диагностика стоп</div> : null}
+              <div
+                className={cx(
+                  "text-sm font-semibold text-[#1c1c1c]",
+                  isZhilvinasProfile ? "leading-snug" : "mt-1.5 leading-5"
+                )}
+              >
+                Индивидуальные стельки
+              </div>
+              <div
+                className={cx(
+                  "text-xs text-neutral-500",
+                  isZhilvinasProfile ? "leading-snug line-clamp-2" : "mt-1 leading-[1.4]"
+                )}
+              >
+                Подбор под ваши параметры и нагрузку
+              </div>
             </button>
             <button
               type="button"
               onClick={() => go("catalog", { category: "compression" })}
-              className="w-[232px] shrink-0 snap-start rounded-2xl border border-[#d9ecee] bg-white p-4 text-left shadow-[0_3px_10px_rgba(0,154,166,0.06)] active:scale-[0.98] transition-transform duration-150 flex flex-col"
+              className={cx(
+                isZhilvinasProfile
+                  ? zhilvinasSpecialistHelpCardClass
+                  : "w-[232px] shrink-0 snap-start rounded-2xl border border-[#d9ecee] bg-white p-4 text-left shadow-[0_3px_10px_rgba(0,154,166,0.06)] active:scale-[0.98] transition-transform duration-150 flex flex-col"
+              )}
             >
-              <div className={cx(homeEyebrow11, "text-[#009AA6]")}>Точный подбор</div>
-              <div className="mt-1.5 text-sm font-semibold leading-5 text-[#1c1c1c]">Компрессия по меркам</div>
-              <div className="mt-1 text-xs text-neutral-500 leading-[1.4]">Заказ изделий по индивидуальным меркам</div>
+              {!isZhilvinasProfile ? <div className={cx(homeEyebrow11, "text-[#009AA6]")}>Точный подбор</div> : null}
+              <div
+                className={cx(
+                  "text-sm font-semibold text-[#1c1c1c]",
+                  isZhilvinasProfile ? "leading-snug" : "mt-1.5 leading-5"
+                )}
+              >
+                Компрессия по меркам
+              </div>
+              <div
+                className={cx(
+                  "text-xs text-neutral-500",
+                  isZhilvinasProfile ? "leading-snug line-clamp-2" : "mt-1 leading-[1.4]"
+                )}
+              >
+                Заказ изделий по индивидуальным меркам
+              </div>
             </button>
             <button
               type="button"
               onClick={() => go("salons")}
-              className="flex w-[72px] shrink-0 snap-start flex-col items-center justify-center gap-1.5 self-stretch rounded-2xl bg-neutral-100 text-neutral-400"
+              className={cx(
+                isZhilvinasProfile
+                  ? zhilvinasSpecialistHelpMoreButtonClass
+                  : "flex w-[72px] shrink-0 snap-start flex-col items-center justify-center gap-1.5 self-stretch rounded-2xl bg-neutral-100 text-neutral-400"
+              )}
             >
               <ChevronRight size={16} strokeWidth={1.5} />
               <span className={cx(homeText11, "font-medium")}>Все</span>
@@ -1078,7 +1517,8 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
           </>
         )}
 
-        <section className="min-w-0">
+        <section className={cx("min-w-0", isZhilvinasProfile && "space-y-2")}>
+          {isZhilvinasProfile ? <h2 className={cx(sectionTitleClass, "px-0.5")}>Для вас</h2> : null}
           <div className="grid grid-cols-2 gap-3">
               {homeFeaturedProducts.map((product) => (
                 <button
@@ -1105,7 +1545,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                 Все товары
               </button>
           </div>
-          {!isKatyaHome && (
+          {isLeshaProfile && (
             <div className="-mx-4 mt-3">
               <div className="flex snap-x snap-proximity gap-3 overflow-x-auto px-4 pb-1 scroll-px-4 [scrollbar-width:none] [-ms-overflow-style:none]">
                 {homeCategories.map((category) => (
@@ -1122,6 +1562,8 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
             </div>
           )}
         </section>
+        </>
+        )}
 
       </div>
     </div>
@@ -2037,7 +2479,7 @@ export default function OrtekaMobilePrototype() {
   };
 
   const showBottomNav = !["product", "cart", "order", "size"].includes(screen);
-  const isKatyaHomeScreen = screen === "home" && isKatyaStyleHomeProfile(homeProfileCustomer);
+  const isKatyaHomeScreen = screen === "home" && (isKatyaStyleHomeProfile(homeProfileCustomer) || isZhilvinasStyleHomeProfile(homeProfileCustomer));
 
   return (
     <PhoneShell>

@@ -23,6 +23,31 @@ body {
   white-space: nowrap;
 }
 
+@keyframes orteka-search-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.orteka-search-marquee-track {
+  animation: orteka-search-marquee 22s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orteka-search-marquee-track {
+    animation: none;
+    transform: none;
+  }
+
+  .orteka-search-marquee-copy:last-child {
+    display: none;
+  }
+}
+
 *,
 *::before,
 *::after {
