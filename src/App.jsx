@@ -14,6 +14,7 @@ import {
   Footprints,
   Grid2X2,
   Heart,
+  Home,
   MapPin,
   Minus,
   Navigation,
@@ -35,6 +36,7 @@ import {
 } from "lucide-react";
 import ortekaLogo from "./assets/orteka-logo.png";
 import pointsLogo from "./assets/points-logo.png";
+import pointsLogo2x from "./assets/points-logo@2x.png";
 import homeQrImage from "./assets/home-qr.png";
 import promoCompressionImage from "./assets/promo-compression.png";
 import promoInsolesImage from "./assets/promo-insoles.png";
@@ -278,30 +280,100 @@ const promoCards = [
 
 const homeOrderItems = [
   {
-    id: "ready",
+    id: "salon",
     tone: "ready",
-    title: "К выдаче сегодня",
+    kind: "salon",
+    title: "ОРТЕКА",
     address: "г. Москва, Тверская, 12",
     timing: "Заберите сегодня до 21:00",
     image: promoInsolesImage,
   },
   {
-    id: "in-transit",
+    id: "pvz",
     tone: "transit",
-    title: "Заказ в пути",
-    address: "г. Москва, ул. Свободы, 40к1",
-    timing: "Приедет завтра",
+    kind: "pvz",
+    title: "ПВЗ",
+    address: "г. Москва, ул. Свободы, 40",
+    timing: "Приедет 16 мая · ориентир 14:00",
     image: promoCompressionImage,
   },
   {
-    id: "needs-action",
-    tone: "attention",
-    title: "Нужно подтверждение",
-    address: "г. Москва, Тверская, 12",
-    timing: "Подтвердите до 18:00",
+    id: "courier",
+    tone: "preparing",
+    kind: "courier",
+    title: "Курьерская доставка",
+    address: "г. Москва, ул. Свободы, 40к1, кв. 84",
+    timing: "Соберём сегодня · доставка завтра, 12:00–18:00",
     image: promoShoesImage,
   },
 ];
+
+const homeOrderTonePriority = { ready: 0, attention: 1, transit: 2, preparing: 3 };
+
+const homeOrderStatusMeta = {
+  ready: {
+    label: "Готов к выдаче",
+    pillClass: "bg-[#e8f7ef] text-[#0d7a45]",
+    dotClass: "bg-[#22c55e]",
+    qrPanelClass: "bg-[#f0fdf4]",
+    timingClass: "font-medium text-[#0d7a45]",
+  },
+  transit: {
+    label: "В пути",
+    pillClass: "bg-[#e8f6f7] text-[#007a84]",
+    dotClass: "bg-[#009aa6]",
+    qrPanelClass: "bg-white",
+    timingClass: "text-[#1c1c1c]",
+  },
+  preparing: {
+    label: "Собираем заказ",
+    pillClass: "bg-[#f3f4f6] text-[#4b5563]",
+    dotClass: "bg-[#9ca3af]",
+    qrPanelClass: "bg-white",
+    timingClass: "text-neutral-600",
+  },
+  attention: {
+    label: "Нужно ваше внимание",
+    pillClass: "bg-[#fff3e9] text-[#c2410c]",
+    dotClass: "bg-[#ff6e00]",
+    qrPanelClass: "bg-[#fffaf5]",
+    timingClass: "font-medium text-[#c2410c]",
+  },
+};
+
+function getHomeOrderStatusMeta(tone) {
+  return homeOrderStatusMeta[tone] ?? homeOrderStatusMeta.preparing;
+}
+
+function HomeOrderStatusPill({ tone, label }) {
+  const meta = getHomeOrderStatusMeta(tone);
+  const text = label ?? meta.label;
+
+  return (
+    <span
+      className={cx(
+        "inline-flex max-w-full items-center gap-1.5 rounded-md px-2 py-0.5",
+        "text-[11px] font-semibold leading-none tracking-tight",
+        meta.pillClass
+      )}
+    >
+      <span className={cx("size-1.5 shrink-0 rounded-full", meta.dotClass)} aria-hidden />
+      <span className="truncate">{text}</span>
+    </span>
+  );
+}
+
+function HomeOrderDeliveryKindIcon({ kind, className = "h-4 w-4 shrink-0 text-[#009AA6]" }) {
+  if (kind === "salon") {
+    return <Store className={className} strokeWidth={2} aria-hidden />;
+  }
+
+  if (kind === "pvz") {
+    return <MapPin className={className} strokeWidth={2} aria-hidden />;
+  }
+
+  return <Home className={className} strokeWidth={2} aria-hidden />;
+}
 
 const SAVED_FILTERS_STORAGE_KEY = "orteka.savedFilters.v1";
 const defaultSavedFilters = [
@@ -839,7 +911,7 @@ function ProductCard({ product, onOpen, compact = false }) {
 
 function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustomer, setHomeProfileCustomer }) {
   const [customerMenuOpen, setCustomerMenuOpen] = useState(false);
-  const [katyaLoyaltyTierOpen, setKatyaLoyaltyTierOpen] = useState(true);
+  const [katyaLoyaltyTierOpen, setKatyaLoyaltyTierOpen] = useState(false);
   const [katyaHomeSegment, setKatyaHomeSegment] = useState("home");
   const [katyaStickyPinned, setKatyaStickyPinned] = useState(false);
   const katyaStickySearchRef = useRef(null);
@@ -849,11 +921,9 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
   const homeEyebrow11 = `${homeText11} font-semibold uppercase tracking-[0.08em]`;
   const katyaSalonNavTextClass = "text-[15px] font-normal leading-snug tracking-tight text-white";
   const promoSliderRef = useRef(null);
-  const prioritizedOrderItems = [...homeOrderItems].sort((a, b) => {
-    if (a.tone === "ready") return -1;
-    if (b.tone === "ready") return 1;
-    return 0;
-  });
+  const prioritizedOrderItems = [...homeOrderItems].sort(
+    (a, b) => (homeOrderTonePriority[a.tone] ?? 9) - (homeOrderTonePriority[b.tone] ?? 9)
+  );
 
   const isKatyaHome = isKatyaStyleHomeProfile(homeProfileCustomer);
   const isLeshaProfile = isLeshaStyleHomeProfile(homeProfileCustomer);
@@ -1075,10 +1145,12 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                         <span>1 240</span>
                         <img
                           src={pointsLogo}
+                          srcSet={`${pointsLogo} 1x, ${pointsLogo2x} 2x`}
                           alt=""
                           className="h-[0.69em] w-[0.69em] shrink-0 object-contain -translate-y-[0.05em]"
                           width={15}
                           height={15}
+                          decoding="async"
                         />
                       </div>
                     </button>
@@ -1304,7 +1376,11 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
         {!isZhilvinasProfile && (
         <div className="-mx-4">
           <div className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [-ms-overflow-style:none]">
-          {prioritizedOrderItems.map((item) => (
+          {prioritizedOrderItems.map((item) => {
+            const statusMeta = getHomeOrderStatusMeta(item.tone);
+            const isReady = item.tone === "ready";
+
+            return (
             <motion.div
               key={item.id}
               role="button"
@@ -1312,8 +1388,15 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
               whileTap={{ scale: 0.98 }}
               onClick={() => go("order")}
               className="box-border flex w-full min-w-full shrink-0 snap-start snap-always cursor-pointer items-stretch pl-4 pr-4"
+              aria-label={`${statusMeta.label}. ${item.title}. ${item.address}. ${item.timing}`}
             >
-              <div className="-ml-4 flex w-[64px] shrink-0 items-center justify-center rounded-r-2xl rounded-l-none bg-white py-3 pl-2.5 pr-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+              <div
+                className={cx(
+                  "-ml-4 flex w-[64px] shrink-0 items-center justify-center rounded-r-2xl rounded-l-none py-3 pl-2.5 pr-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]",
+                  statusMeta.qrPanelClass,
+                  isReady && "ring-1 ring-inset ring-[#bbf7d0]"
+                )}
+              >
                 <img
                   src={homeQrImage}
                   alt=""
@@ -1323,23 +1406,39 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                 />
               </div>
               <div className="ml-2 flex min-w-0 flex-1 gap-2.5 rounded-2xl bg-white p-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
-                <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-[#eef1f4]">
+                <div className="h-full w-16 shrink-0 overflow-hidden rounded-2xl bg-[#eef1f4]">
                   {item.image ? (
-                    <img src={item.image} alt="" className="h-full w-full object-cover" />
+                    <img
+                      src={item.image}
+                      alt=""
+                      className="block h-full w-full object-fill object-center"
+                    />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center">
-                      <ShoppingBag size={20} className="text-neutral-300" />
+                      <ShoppingBag size={20} className="text-neutral-300" aria-hidden />
                     </div>
                   )}
                 </div>
-                <div className="min-w-0 flex flex-col justify-center gap-0.5 py-0.5">
-                  <p className="text-[15px] font-semibold leading-[1.25] tracking-tight text-[#1c1c1c]">{item.title}</p>
-                  <p className="text-xs leading-4 text-neutral-500 line-clamp-2">{item.address}</p>
-                  <p className="text-sm leading-5 text-[#1c1c1c]">{item.timing}</p>
+                <div className="min-w-0 flex flex-1 flex-col justify-center gap-1 py-0.5">
+                  <HomeOrderStatusPill tone={item.tone} label={item.statusLabel} />
+                  <p className="flex min-w-0 items-center gap-1.5 text-[15px] font-semibold tracking-tight text-[#1c1c1c]">
+                    {item.kind ? (
+                      <span className="flex h-[1.25em] shrink-0 items-center">
+                        <HomeOrderDeliveryKindIcon
+                          kind={item.kind}
+                          className="block h-[1em] w-[1em] text-[#1c1c1c]"
+                        />
+                      </span>
+                    ) : null}
+                    <span className="min-w-0 truncate leading-[1.25]">{item.title}</span>
+                  </p>
+                  <p className="min-w-0 truncate text-xs leading-4 text-neutral-500">{item.address}</p>
+                  <p className={cx("text-sm leading-5", statusMeta.timingClass)}>{item.timing}</p>
                 </div>
               </div>
             </motion.div>
-          ))}
+            );
+          })}
           </div>
         </div>
         )}
