@@ -39,6 +39,7 @@ import ortekaSalonMark from "./assets/orteka-salon-mark.png";
 import cdekPvzMark from "./assets/cdek-pvz-mark.png";
 import pointsLogo from "./assets/points-logo.png";
 import pointsLogo2x from "./assets/points-logo@2x.png";
+import katyaAuthGiftBonusImage from "./assets/katya-auth-gift-bonus.png";
 import homeQrImage from "./assets/home-qr.png";
 import promoCompressionImage from "./assets/promo-compression.png";
 import promoInsolesImage from "./assets/promo-insoles.png";
@@ -390,8 +391,8 @@ const salons = [
 ];
 
 const katyaHomeQuickTiles = [
-  { id: "symptoms", title: "Симптомы", category: "all", image: katyaTileSymptomsImage },
   { id: "booking", title: "Записаться", screen: "services", image: katyaTileBookingImage },
+  { id: "symptoms", title: "Симптомы", category: "all", image: katyaTileSymptomsImage },
   { id: "sfr", title: "Сертификат СФР", screen: "services", image: katyaTileSfrImage },
   { id: "new", title: "Новинки", category: "all", image: katyaTileNewImage },
   { id: "hits", title: "Хиты", category: "all", image: katyaTileHitsImage },
@@ -575,19 +576,30 @@ const defaultSavedFilters = [
   { id: "compression-m", label: "Трикотаж · M · 2 класс", category: "compression", query: "компрессия", onlyNearby: false },
 ];
 
+const KATYA_HOME_PROFILE_NAME = "Катя";
+const KATYA_GUEST_HOME_PROFILE_NAME = "Неавторизованный пользователь";
+
 const homeProfileCustomers = [
-  { name: "Катя", disabled: false },
+  { name: KATYA_HOME_PROFILE_NAME, disabled: false },
+  { name: KATYA_GUEST_HOME_PROFILE_NAME, disabled: false },
   { name: "Жильвинас", disabled: false },
-  { name: "В разработке", disabled: false },
   { name: "Лёша", disabled: false },
 ];
 
-const katyaStyleHomeProfiles = new Set(["Катя", "В разработке"]);
+const katyaStyleHomeProfiles = new Set([KATYA_HOME_PROFILE_NAME, KATYA_GUEST_HOME_PROFILE_NAME]);
 const leshaStyleHomeProfiles = new Set(["Лёша"]);
 const zhilvinasStyleHomeProfiles = new Set(["Жильвинас"]);
 
 function isKatyaStyleHomeProfile(customerName) {
   return katyaStyleHomeProfiles.has(customerName);
+}
+
+function isKatyaHomeLayoutProfile(customerName) {
+  return katyaStyleHomeProfiles.has(customerName);
+}
+
+function isKatyaGuestHomeProfile(customerName) {
+  return customerName === KATYA_GUEST_HOME_PROFILE_NAME;
 }
 
 function isLeshaStyleHomeProfile(customerName) {
@@ -1003,7 +1015,7 @@ function HomeQuickTilesRow({ go, variant = "feed", embedded = false }) {
             : cx(
                 "flex snap-x snap-proximity overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
                 embedded
-                  ? "min-w-0 w-[400px] items-start justify-start gap-[2px] overscroll-x-contain pb-0 scroll-px-4 pl-4 pr-4 -ml-4 -mr-4"
+                  ? "min-w-0 w-[400px] items-start justify-start gap-[2px] overscroll-x-contain pb-0 scroll-px-4 pl-4 pr-8 -ml-4 -mr-4"
                   : "gap-1.5 pb-1 scroll-px-4"
               )
       )}
@@ -1257,8 +1269,8 @@ function PhoneShell({ children, katyaAuthPromptVisible = false, sidePanel = null
           data-katya-auth-prompt={katyaAuthPromptVisible ? "true" : "false"}
           className={cx(
             "relative flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-white sm:rounded-[32px]",
-            "data-[katya-auth-prompt=true]:[&_[data-scroll-root]:not(.scroll-pb-24)]:!pb-[7.75rem]",
-            "data-[katya-auth-prompt=true]:[&_[data-scroll-root].scroll-pb-24]:!pb-[8.75rem]"
+            "data-[katya-auth-prompt=true]:[&_[data-scroll-root]:not(.scroll-pb-24)]:!pb-[9.25rem]",
+            "data-[katya-auth-prompt=true]:[&_[data-scroll-root].scroll-pb-24]:!pb-[10.25rem]"
           )}
         >
           <div className="absolute top-0 left-1/2 z-50 hidden h-6 w-32 -translate-x-1/2 rounded-b-2xl bg-neutral-950 sm:block" />
@@ -1302,49 +1314,62 @@ function Header({ title, subtitle, onBack, right }) {
 function KatyaAuthPromptStrip({ onDismiss, onAuthorize }) {
   return (
     <motion.div
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: "auto" }}
-      exit={{ opacity: 0, height: 0 }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 14 }}
+      transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
       role="region"
       aria-label="Вход в аккаунт"
-      className="overflow-hidden border-t border-[#ffe4cc] bg-[linear-gradient(180deg,#FFF9F4_0%,#FFF5ED_100%)]"
+      className="overflow-hidden px-3 pb-3"
     >
-      <div className="flex items-center gap-2 px-3 py-2.5">
-        <p className="mx-2 min-w-0 flex-1 text-[12px] leading-[1.35] text-[#1c1c1c]">
-          <button
-            type="button"
-            onClick={onAuthorize}
-            className="!font-semibold text-[#ff6e00] transition-colors hover:text-[#f06810] active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6e00]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[#fff5ed] rounded-sm"
-          >
-            Войдите
-          </button>
-          <span className="text-neutral-600"> — не пропустите бонусы</span>
-        </p>
-        <button
-          type="button"
-          onClick={onAuthorize}
-          aria-label="Войти в аккаунт"
-          className="flex shrink-0 items-center justify-center transition-transform hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6e00]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[#fff5ed] rounded-sm"
-        >
-          <img
-            src={pointsLogo}
-            srcSet={`${pointsLogo} 1x, ${pointsLogo2x} 2x`}
-            alt=""
-            className="h-7 w-7 object-contain"
-            width={28}
-            height={28}
-            decoding="async"
-          />
-        </button>
+      <div className="relative rounded-2xl bg-gradient-to-br from-[#fff6ef] via-[#fffaf5] to-[#fff8f2] px-3 py-3 pr-10 shadow-[0_4px_20px_rgba(15,23,42,0.1)]">
         <button
           type="button"
           onClick={onDismiss}
           aria-label="Закрыть"
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[18px] font-light leading-none text-neutral-400 transition-colors hover:bg-black/[0.04] hover:text-neutral-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6e00]/25"
+          className="absolute right-1.5 top-1.5 z-10 flex h-7 w-7 items-center justify-center rounded-full text-neutral-400 transition-colors hover:bg-white/80 hover:text-neutral-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6e00]/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[#fffaf5]"
         >
-          ×
+          <X size={16} strokeWidth={1.75} aria-hidden />
         </button>
+
+        <div className="flex items-center gap-3">
+          <img
+            src={katyaAuthGiftBonusImage}
+            alt=""
+            className="h-[60px] w-[60px] shrink-0 object-contain object-center"
+            width={60}
+            height={60}
+            decoding="async"
+            aria-hidden
+          />
+
+          <div className="min-w-0 flex-1">
+            <p className="text-[14px] font-semibold leading-[1.3] tracking-tight text-[#1c1c1c]">
+              <span className="bg-[linear-gradient(120deg,#ff6e00_0%,#e35f00_100%)] bg-clip-text font-bold tabular-nums text-transparent">
+                1000
+              </span>{" "}
+              бонусов ждут вас внутри!
+            </p>
+            <p className="mt-1 text-[12px] font-normal leading-[1.35] text-neutral-600">
+              Просто войдите в аккаунт
+            </p>
+            <button
+              type="button"
+              onClick={onAuthorize}
+              aria-label="Войти или зарегистрироваться"
+              className={cx(
+                "mt-2.5 inline-flex h-9 w-full items-center justify-center rounded-xl px-3",
+                "bg-[linear-gradient(168deg,#ff7a28_0%,#ff6e00_42%,#e35f00_100%)]",
+                "text-[13px] font-semibold leading-none tracking-tight text-white",
+                "shadow-[0_1px_2px_rgba(227,95,0,0.28),inset_0_1px_0_rgba(255,255,255,0.22)]",
+                "transition-[filter,transform] duration-150 active:scale-[0.98] active:brightness-95",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6e00]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#fffaf5]"
+              )}
+            >
+              Войти / Зарегистрироваться
+            </button>
+          </div>
+        </div>
       </div>
     </motion.div>
   );
@@ -1357,10 +1382,10 @@ function BottomNav({
   setHomeProfileCustomer,
   showKatyaAuthPrompt,
   onDismissKatyaAuthPrompt,
+  onKatyaAuthorize,
 }) {
   const [homeProfilePickerOpen, setHomeProfilePickerOpen] = useState(false);
   const homeTabProfileSwitch = screen === "home";
-  const isKatyaProfile = homeProfileCustomer === "Катя";
 
   useEffect(() => {
     if (!homeProfilePickerOpen) {
@@ -1394,7 +1419,10 @@ function BottomNav({
   return (
     <div
       data-bottom-nav-root
-      className="absolute bottom-0 left-0 right-0 z-40 flex flex-col shadow-[0_-4px_8px_rgba(0,0,0,0.08)]"
+      className={cx(
+        "absolute bottom-0 left-0 right-0 z-40 flex flex-col",
+        !showKatyaAuthPrompt && "shadow-[0_-4px_8px_rgba(0,0,0,0.08)]"
+      )}
     >
       {homeProfilePickerOpen && (
         <div
@@ -1424,16 +1452,19 @@ function BottomNav({
         </div>
       )}
       <AnimatePresence initial={false}>
-        {showKatyaAuthPrompt && isKatyaProfile ? (
+        {showKatyaAuthPrompt ? (
           <KatyaAuthPromptStrip
             key="katya-auth-prompt"
             onDismiss={onDismissKatyaAuthPrompt}
-            onAuthorize={() => go("profile")}
+            onAuthorize={onKatyaAuthorize ?? (() => go("profile"))}
           />
         ) : null}
       </AnimatePresence>
       <nav
-        className="bg-white px-2 pt-1"
+        className={cx(
+          "bg-white px-2 pt-1",
+          showKatyaAuthPrompt && "shadow-[0_-4px_8px_rgba(0,0,0,0.08)]"
+        )}
         style={{ paddingBottom: "max(env(safe-area-inset-bottom), 6px)" }}
         aria-label="Основная навигация"
       >
@@ -1665,7 +1696,7 @@ function HomeFeedProductCard({ product, onOpen, showFavorite, isFavorite, onTogg
           aria-label={isFavorite ? "Убрать из избранного" : "Добавить в избранное"}
           aria-pressed={isFavorite}
           onClick={() => onToggleFavorite(product.id)}
-          className="absolute top-5 right-5 z-10 p-0.5 transition-[color,transform] duration-150 active:scale-95"
+          className="absolute top-[6px] right-[6px] z-10 p-0.5 transition-[color,transform] duration-150 active:scale-95"
         >
           <Heart
             size={20}
@@ -1737,10 +1768,15 @@ function HomeScreen({
   const isZhilvinasProfile = isZhilvinasStyleHomeProfile(homeProfileCustomer);
   const isLeshaLayoutBody = isLeshaLayoutBodyProfile(homeProfileCustomer);
   const isKatyaFlatHeader = isKatyaHome || isZhilvinasProfile;
-  const isKatyaProfile = homeProfileCustomer === "Катя";
-  const showKatyaLoyaltyGuest = isKatyaProfile && !katyaIsAuthenticated;
-  const usesHomeSegments = isKatyaProfile || isZhilvinasProfile;
-  const showHomeProductFavorites = isKatyaProfile || isZhilvinasProfile;
+  const isKatyaHomeLayout = isKatyaHomeLayoutProfile(homeProfileCustomer);
+  const isKatyaGuestHome = isKatyaGuestHomeProfile(homeProfileCustomer);
+  const showKatyaLoyaltyGuest =
+    homeProfileCustomer === KATYA_HOME_PROFILE_NAME && !katyaIsAuthenticated;
+  /** Заказы на главной — только у авторизованной Кати. */
+  const showKatyaHomeOrders =
+    homeProfileCustomer === KATYA_HOME_PROFILE_NAME && katyaIsAuthenticated;
+  const usesHomeSegments = isKatyaHomeLayout || isZhilvinasProfile;
+  const showHomeProductFavorites = isKatyaHomeLayout || isZhilvinasProfile;
 
   const toggleHomeFavorite = (productId) => {
     setHomeFavoriteIds((prev) => {
@@ -1819,12 +1855,13 @@ function HomeScreen({
   }, []);
 
   const katyaUnifiedHomeFeed =
-    isKatyaProfile && isKatyaHome && isKatyaHomeSegment;
+    isKatyaHomeLayout && isKatyaHome && isKatyaHomeSegment;
   const zhilvinasUnifiedHomeFeed =
     isZhilvinasProfile && usesHomeSegments && isKatyaHomeSegment;
+  const katyaGuestUnifiedHeader = isKatyaGuestHome && usesHomeSegments;
 
   const renderKatyaStickySearchPanel = ({ zhilvinasInHeaderShell = false } = {}) => {
-    if (!usesHomeSegments) {
+    if (!usesHomeSegments || isKatyaGuestHome) {
       return null;
     }
     if (isZhilvinasProfile && zhilvinasUnifiedHomeFeed && !zhilvinasInHeaderShell) {
@@ -1893,7 +1930,7 @@ function HomeScreen({
               go("catalog", { category: "all" });
             }}
             onFocus={() => go("catalog", { category: "all" })}
-            smartRibbon={isKatyaProfile}
+            smartRibbon={isKatyaHomeLayout}
           />
           <div className="mt-3">
             <KatyaHomeSegmentTabs
@@ -1909,7 +1946,80 @@ function HomeScreen({
     );
   };
 
+  const renderKatyaGuestUnifiedHeader = () => {
+    if (!katyaGuestUnifiedHeader) {
+      return null;
+    }
+
+    return (
+      <motion.div
+        ref={katyaStickySearchRef}
+        className={cx(
+          katyaHeaderGradientClass,
+          "-mx-4 sticky top-0 z-40 text-white shadow-none",
+          "border-b rounded-b-3xl px-4 pb-4",
+          katyaHeaderShellEdgeClass,
+          katyaStickyPinned
+            ? "pt-2 sm:pt-8"
+            : "pt-[max(0px,env(safe-area-inset-top,0px))] sm:pt-6"
+        )}
+      >
+        {!katyaStickyPinned ? (
+          <PhoneStatusBar className="-mx-4 mb-0.5 h-9 px-4 !pb-1 !pt-0 sm:mx-0 sm:!pt-0" />
+        ) : null}
+        <div className="flex min-h-6 items-center justify-between gap-3 font-sans">
+          <button
+            type="button"
+            onClick={() => go("salons")}
+            aria-label="Найти салон"
+            className={cx(
+              katyaSalonNavTextClass,
+              "flex shrink-0 items-center gap-0.5 rounded-lg border-0 bg-transparent p-0 font-inherit text-left transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2",
+              katyaHeaderFocusRingOffsetClass
+            )}
+          >
+            <span className="font-inherit">Найти салон</span>
+            <ChevronRight className="shrink-0 text-white opacity-95" size={17} strokeWidth={2} aria-hidden />
+          </button>
+          <button
+            type="button"
+            onClick={() => go("salons")}
+            aria-label="Город: Москва. Подробнее в списке салонов"
+            className={cx(
+              katyaSalonNavTextClass,
+              "flex min-w-0 items-center gap-0.5 rounded-lg border-0 bg-transparent p-0 font-inherit text-left transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2",
+              katyaHeaderFocusRingOffsetClass
+            )}
+          >
+            <span className="truncate font-inherit">г. Москва</span>
+            <ChevronRight className="shrink-0 text-white opacity-95" size={17} strokeWidth={2} aria-hidden />
+          </button>
+        </div>
+        <div className="mt-3">
+          <SearchBar
+            value=""
+            onChange={(value) => {
+              setSearchValue(value);
+              go("catalog", { category: "all" });
+            }}
+            onFocus={() => go("catalog", { category: "all" })}
+            smartRibbon
+          />
+        </div>
+        <div className="mt-3">
+          <KatyaHomeSegmentTabs
+            value={katyaHomeSegment}
+            onChange={setKatyaHomeSegment}
+            segments={katyaHomeSegments}
+            layoutId="katya-guest-home-segment-pill"
+          />
+        </div>
+      </motion.div>
+    );
+  };
+
   const katyaStickySearchPanel = renderKatyaStickySearchPanel();
+  const katyaGuestUnifiedHeaderPanel = renderKatyaGuestUnifiedHeader();
 
   const zhilvinasHomeSegmentTabs = (
     <KatyaHomeSegmentTabs
@@ -1927,7 +2037,8 @@ function HomeScreen({
     <div className={cx("h-full overflow-y-auto overflow-x-hidden pb-20 data-scroll-root", homeFeedBackgroundClass)}>
       <div
         className={cx(
-          "px-4 pb-4 flex flex-col gap-4",
+          "px-4 pb-4 flex flex-col",
+          katyaGuestUnifiedHeader ? "gap-0" : "gap-4",
           isKatyaFlatHeader ? "pt-0" : "pt-4"
         )}
       >
@@ -1985,9 +2096,11 @@ function HomeScreen({
           style={isZhilvinasProfile && usesHomeSegments ? zhilvinasHeaderShellStyle : undefined}
         >
         {isKatyaFlatHeader && isZhilvinasProfile && usesHomeSegments ? <PhoneStatusBar /> : null}
+        {katyaGuestUnifiedHeaderPanel}
+        {!katyaGuestUnifiedHeader ? (
         <section
           className={cx(
-            isKatyaProfile
+            isKatyaHomeLayout
               ? cx(
                   "-mx-4 border-0 px-4 pb-0 pt-1 text-white",
                   katyaHeaderGradientClass
@@ -2011,7 +2124,7 @@ function HomeScreen({
             <PhoneStatusBar className="-mx-4 mb-0.5 px-4 sm:mx-0" />
           ) : null}
           {isKatyaHome ? (
-            isKatyaProfile ? (
+            isKatyaHomeLayout ? (
               <div className="flex min-h-6 items-center justify-between gap-3 font-sans">
                 <button
                   type="button"
@@ -2067,22 +2180,8 @@ function HomeScreen({
             </div>
           )}
 
-          {isKatyaHome && !isKatyaProfile && (
-            <div className="mt-3">
-              <SearchBar
-                value=""
-                onChange={(value) => {
-                  setSearchValue(value);
-                  go("catalog", { category: "all" });
-                }}
-                onFocus={() => go("catalog", { category: "all" })}
-                smartRibbon
-              />
-            </div>
-          )}
-
-          {isKatyaHome && (
-              <div className={cx("mt-3 space-y-1.5", !isKatyaProfile && "pb-4")}>
+          {isKatyaHome && !isKatyaGuestHome && (
+              <div className="mt-3 space-y-1.5">
                 {showKatyaLoyaltyGuest ? (
                   <button
                     type="button"
@@ -2286,8 +2385,13 @@ function HomeScreen({
           )}
 
         </section>
+        ) : null}
 
-        {usesHomeSegments && !katyaUnifiedHomeFeed && !zhilvinasUnifiedHomeFeed && katyaStickySearchPanel}
+        {usesHomeSegments &&
+          !katyaUnifiedHomeFeed &&
+          !zhilvinasUnifiedHomeFeed &&
+          !katyaGuestUnifiedHeader &&
+          katyaStickySearchPanel}
         </motion.div>
 
         {usesHomeSegments && katyaHomeSegment === "med-center" && (
@@ -2339,9 +2443,17 @@ function HomeScreen({
         {isKatyaHomeSegment && (
         <>
         {isKatyaHome && !isZhilvinasProfile ? (
-          <section className={cx(katyaHomeFeedStackClass, "-mb-1", katyaUnifiedHomeFeed && "-mt-4 pt-0")}>
-            {katyaUnifiedHomeFeed && katyaStickySearchPanel}
-            <div className="-mx-4">
+          <section
+            className={cx(
+              katyaHomeFeedStackClass,
+              "-mb-1",
+              katyaUnifiedHomeFeed && !katyaGuestUnifiedHeader && "-mt-4 pt-0",
+              katyaUnifiedHomeFeed && katyaGuestUnifiedHeader && "pt-1"
+            )}
+          >
+            {katyaUnifiedHomeFeed && !katyaGuestUnifiedHeader && katyaStickySearchPanel}
+            {showKatyaHomeOrders && (
+            <motion.div className="-mx-4">
               <div className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none]">
               {prioritizedOrderItems.map((item) => {
             const statusMeta = getHomeOrderStatusMeta(item.tone);
@@ -2409,7 +2521,8 @@ function HomeScreen({
             );
               })}
               </div>
-            </div>
+            </motion.div>
+            )}
             <motion.div
               ref={promoSliderRef}
               className="-mx-4 flex min-w-0 justify-center snap-x snap-proximity overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden gap-2 px-[17px]"
@@ -2461,7 +2574,7 @@ function HomeScreen({
           </section>
         ) : (
           <>
-            {!isZhilvinasProfile && (
+            {!isZhilvinasProfile && showKatyaHomeOrders && (
             <div className="-mx-4">
               <div className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none]">
               {prioritizedOrderItems.map((item) => {
@@ -3546,7 +3659,7 @@ function OrderScreen({ go }) {
 export default function OrtekaMobilePrototype() {
   const [screen, setScreen] = useState("home");
   const [homeProfileCustomer, setHomeProfileCustomer] = useState("Катя");
-  const [katyaIsAuthenticated, setKatyaIsAuthenticated] = useState(false);
+  const [katyaIsAuthenticated, setKatyaIsAuthenticated] = useState(true);
   const [katyaAuthPromptDismissed, setKatyaAuthPromptDismissed] = useState(false);
   const [zhilvinasHeaderGradient, setZhilvinasHeaderGradient] = useState(loadZhilvinasHeaderGradient);
   const [zhilvinasGradientTunerOpen, setZhilvinasGradientTunerOpen] = useState(true);
@@ -3559,7 +3672,7 @@ export default function OrtekaMobilePrototype() {
   }, [homeProfileCustomer]);
 
   useEffect(() => {
-    if (homeProfileCustomer !== "Катя") {
+    if (!isKatyaHomeLayoutProfile(homeProfileCustomer)) {
       setKatyaAuthPromptDismissed(false);
     }
   }, [homeProfileCustomer]);
@@ -3671,7 +3784,18 @@ export default function OrtekaMobilePrototype() {
   };
 
   const showBottomNav = !["product", "cart", "order", "size"].includes(screen);
-  const showKatyaAuthPrompt = false;
+  const showKatyaAuthPrompt =
+    showBottomNav &&
+    screen === "home" &&
+    isKatyaGuestHomeProfile(homeProfileCustomer) &&
+    !katyaAuthPromptDismissed;
+
+  const handleKatyaAuthorize = () => {
+    setKatyaIsAuthenticated(true);
+    setHomeProfileCustomer((current) =>
+      current === KATYA_GUEST_HOME_PROFILE_NAME ? KATYA_HOME_PROFILE_NAME : current
+    );
+  };
   const isKatyaHomeScreen = screen === "home" && (isKatyaStyleHomeProfile(homeProfileCustomer) || isZhilvinasStyleHomeProfile(homeProfileCustomer));
   const showZhilvinasGradientTuner =
     ZHILVINAS_HEADER_GRADIENT_TUNER_ENABLED &&
@@ -3731,7 +3855,7 @@ export default function OrtekaMobilePrototype() {
               setHomeProfileCustomer={setHomeProfileCustomer}
               zhilvinasHeaderGradient={zhilvinasHeaderGradient}
               katyaIsAuthenticated={katyaIsAuthenticated}
-              onKatyaAuthorize={() => setKatyaIsAuthenticated(true)}
+              onKatyaAuthorize={handleKatyaAuthorize}
             />
           )}
 
@@ -3767,13 +3891,14 @@ export default function OrtekaMobilePrototype() {
           setHomeProfileCustomer={setHomeProfileCustomer}
           showKatyaAuthPrompt={showKatyaAuthPrompt}
           onDismissKatyaAuthPrompt={() => setKatyaAuthPromptDismissed(true)}
+          onKatyaAuthorize={handleKatyaAuthorize}
         />
       )}
       {toastMessage && (
         <div
           className={cx(
             "absolute left-1/2 z-50 -translate-x-1/2 rounded-lg bg-[#1c1c1c] px-3 py-2 text-xs font-medium text-white shadow-lg",
-            showKatyaAuthPrompt ? "bottom-[7.25rem]" : "bottom-16"
+            showKatyaAuthPrompt ? "bottom-[9.5rem]" : "bottom-16"
           )}
         >
           {toastMessage}
