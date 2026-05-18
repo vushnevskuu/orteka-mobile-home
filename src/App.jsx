@@ -1,12 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  BadgePercent,
   Bandage,
   Bed,
   Bell,
   Bone,
-  Calendar,
   Camera,
   Check,
   ChevronDown,
@@ -67,6 +65,12 @@ import tabCatalogFigmaIcon from "./assets/tab-catalog-figma.svg";
 import tabFavFigmaIcon from "./assets/tab-fav-figma.svg";
 import tabHomeFigmaIcon from "./assets/tab-home-figma.svg";
 import tabProfileFigmaIcon from "./assets/tab-profile-figma.svg";
+import katyaTileBookingImage from "./assets/katya-tile-booking.png";
+import katyaTileHitsImage from "./assets/katya-tile-hits.png";
+import katyaTileNewImage from "./assets/katya-tile-new.png";
+import katyaTileSymptomsImage from "./assets/katya-tile-symptoms.png";
+import katyaTilePromoImage from "./assets/katya-tile-promo.png";
+import katyaTileSfrImage from "./assets/katya-tile-sfr.png";
 import zhilvinasBookingCalendarImage from "./assets/zhilvinas-booking-calendar.png";
 import zhilvinasTileBracesImage from "./assets/zhilvinas-tile-braces.png";
 import zhilvinasTileCompressionImage from "./assets/zhilvinas-tile-compression.png";
@@ -349,6 +353,23 @@ const homeFeaturedProducts = homeFeaturedProductIds
   .map((id) => products.find((product) => product.id === id))
   .filter(Boolean);
 
+/** Подборки в сетке товаров на главной Жильвинаса (отдельно от табов «Магазин / Пациентам / Врачам»). */
+const zhilvinasHomeProductTabs = [
+  { id: "for-you", label: "Для вас" },
+  { id: "new", label: "Новинки" },
+  { id: "knee-pain", label: "При болях в колене" },
+];
+
+const zhilvinasHomeProductCollectionIds = {
+  "for-you": homeFeaturedProductIds,
+  new: [11, 8, 10, 16, 4, 7, 13, 14, 12, 1, 6, 2],
+  "knee-pain": [3, 9, 4, 11, 16, 1, 7, 15, 5],
+};
+
+function productsByIds(ids) {
+  return ids.map((id) => products.find((product) => product.id === id)).filter(Boolean);
+}
+
 const salons = [
   {
     id: 1,
@@ -369,12 +390,12 @@ const salons = [
 ];
 
 const katyaHomeQuickTiles = [
-  { id: "symptoms", title: "Симптомы", category: "all", icon: Stethoscope },
-  { id: "booking", title: "Записаться", screen: "services", icon: Calendar },
-  { id: "sfr", title: "Сертификат СФР", screen: "services", icon: FileText },
-  { id: "new", title: "Новинки", category: "all", icon: Sparkles },
-  { id: "hits", title: "Хиты", category: "all", icon: Star },
-  { id: "promo", title: "Акции", category: "all", icon: BadgePercent },
+  { id: "symptoms", title: "Симптомы", category: "all", image: katyaTileSymptomsImage },
+  { id: "booking", title: "Записаться", screen: "services", image: katyaTileBookingImage },
+  { id: "sfr", title: "Сертификат СФР", screen: "services", image: katyaTileSfrImage },
+  { id: "new", title: "Новинки", category: "all", image: katyaTileNewImage },
+  { id: "hits", title: "Хиты", category: "all", image: katyaTileHitsImage },
+  { id: "promo", title: "Акции", category: "all", image: katyaTilePromoImage },
 ];
 
 const zhilvinasHeaderQuickTiles = katyaHomeQuickTiles
@@ -604,18 +625,32 @@ const zhilvinasCatalogTilesRowClass =
 const zhilvinasCatalogTileButtonClass =
   "w-[64px] shrink-0 snap-start flex-col items-center justify-center gap-1.5";
 const zhilvinasCatalogTileIconBoxClass =
-  "mx-auto flex aspect-square w-[60px] shrink-0 items-center justify-center rounded-2xl p-1.5";
+  "mx-auto flex aspect-square w-[50px] shrink-0 items-center justify-center rounded-2xl p-1.5";
 const zhilvinasCatalogTileLabelClass =
   "block w-full text-center text-[12px] font-medium leading-tight text-[#1c1c1c]";
 /** CTA «Записаться» — фирменный бирюзовый, контраст с белыми плитками. */
 const zhilvinasCatalogCtaTileIconClass = `${zhilvinasCatalogTileIconBoxClass} border-0 shadow-[0_6px_16px_rgba(0,154,166,0.28)] bg-[radial-gradient(ellipse_80%_70%_at_100%_0%,rgba(255,255,255,0.22)_0%,transparent_55%),linear-gradient(155deg,#007a84_0%,#009AA6_42%,#00b0be_100%)]`;
 const zhilvinasCatalogCtaTileImageClass =
-  "mx-auto block aspect-square w-[60px] shrink-0 overflow-hidden rounded-2xl border-0 shadow-[0_6px_16px_rgba(0,154,166,0.28)]";
+  "mx-auto block aspect-square w-[50px] shrink-0 overflow-hidden rounded-2xl border-0 shadow-[0_6px_16px_rgba(0,154,166,0.28)]";
 const zhilvinasCatalogCtaTileLabelClass =
   "block w-full text-center text-[12px] font-semibold leading-tight text-[#007a84]";
 const zhilvinasCatalogDefaultTileIconClass = `${zhilvinasCatalogTileIconBoxClass} border border-[#e7e9ee] bg-white shadow-[0_4px_12px_rgba(0,0,0,0.04)]`;
 const zhilvinasCatalogTileImageClass =
-  "mx-auto block aspect-square w-[60px] shrink-0 overflow-hidden rounded-2xl border border-[#e7e9ee] shadow-[0_4px_12px_rgba(0,0,0,0.04)]";
+  "mx-auto block aspect-square w-[50px] shrink-0 overflow-hidden rounded-2xl border border-[#e7e9ee] shadow-[0_4px_12px_rgba(0,0,0,0.04)]";
+
+/** Иконка/картинка в горизонтальной ленте быстрых плиток Кати — без подложки и скруглений. */
+const katyaFeedTileVisualClass =
+  "mx-auto flex h-[60px] w-[60px] shrink-0 items-center justify-center overflow-visible rounded-none bg-transparent";
+const katyaFeedTileImageClass =
+  "h-[60px] w-[60px] object-contain object-center";
+
+/** Лента главной — ровный светлый нейтральный фон (не белый, без градиента и бежевого оттенка). */
+const homeFeedBackgroundClass = "bg-[#F7F7F5]";
+const homeFeedSurfaceMutedClass = "bg-[#EFEFEC]";
+const homeFeedFocusRingOffsetClass = "focus-visible:ring-offset-[#F7F7F5]";
+/** Заказ + промо + быстрые плитки на главной Кати — один белый блок с равными отступами. */
+const katyaHomeFeedStackClass =
+  "-mx-4 flex min-w-0 flex-col gap-3 rounded-b-3xl bg-white px-4 py-3";
 
 const katyaHeaderGradientClass =
   "bg-[radial-gradient(ellipse_82%_64%_at_94%_108%,#ffb35a_0%,rgba(255,104,24,0.38)_50%,transparent_72%),linear-gradient(168deg,#d95800_0%,#ff6e00_30%,#ff7a28_58%,#b84700_100%)]";
@@ -626,12 +661,238 @@ const katyaHeaderStickySurfaceClass =
   "bg-[linear-gradient(168deg,#ff6e00_0%,#f06810_38%,#c44f00_100%)]";
 const katyaHeaderFocusRingOffsetClass = "focus-visible:ring-offset-[#e35f00]";
 
-const zhilvinasUnifiedHeaderShellClass = cx(
-  katyaHeaderGradientClass,
+const zhilvinasUnifiedHeaderShellLayoutClass = cx(
   "-mx-4 flex flex-col overflow-hidden rounded-b-3xl border-b",
-  katyaHeaderShellEdgeClass,
-  katyaHeaderShellShadowClass
+  katyaHeaderShellEdgeClass
 );
+
+const ZHILVINAS_HEADER_GRADIENT_STORAGE_KEY = "orteka-zhilvinas-header-gradient";
+
+/** Панель подстройки градиента шапки Жильвинаса (снаружи макета телефона). */
+const ZHILVINAS_HEADER_GRADIENT_TUNER_ENABLED = false;
+
+const ZHILVINAS_HEADER_GRADIENT_DEFAULT = {
+  linearAngle: 168,
+  stop0: "#d95800",
+  stop30: "#ff6e00",
+  stop58: "#ff7a28",
+  stop100: "#b84700",
+  radialColor: "#ffb35a",
+  radialMidAlpha: 0.38,
+  radialX: 94,
+  radialY: 108,
+  stickyMid: "#f06810",
+  shadowAlpha: 0.26,
+};
+
+function hexToRgb(hex) {
+  const normalized = String(hex || "").replace("#", "");
+  if (normalized.length !== 6) {
+    return [255, 110, 0];
+  }
+
+  return [
+    Number.parseInt(normalized.slice(0, 2), 16),
+    Number.parseInt(normalized.slice(2, 4), 16),
+    Number.parseInt(normalized.slice(4, 6), 16),
+  ];
+}
+
+function rgbaFromHex(hex, alpha) {
+  const [r, g, b] = hexToRgb(hex);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function buildZhilvinasHeaderBackground(config) {
+  const radialMid = rgbaFromHex(config.stop30, config.radialMidAlpha);
+  return [
+    `radial-gradient(ellipse 82% 64% at ${config.radialX}% ${config.radialY}%, ${config.radialColor} 0%, ${radialMid} 50%, transparent 72%)`,
+    `linear-gradient(${config.linearAngle}deg, ${config.stop0} 0%, ${config.stop30} 30%, ${config.stop58} 58%, ${config.stop100} 100%)`,
+  ].join(", ");
+}
+
+function buildZhilvinasStickyBackground(config) {
+  return `linear-gradient(${config.linearAngle}deg, ${config.stop30} 0%, ${config.stickyMid} 38%, ${config.stop100} 100%)`;
+}
+
+function buildZhilvinasHeaderBoxShadow(config) {
+  const [r, g, b] = hexToRgb(config.stop100);
+  return `0 8px 22px rgba(${r}, ${g}, ${b}, ${config.shadowAlpha ?? 0.26})`;
+}
+
+function loadZhilvinasHeaderGradient() {
+  if (typeof window === "undefined") {
+    return ZHILVINAS_HEADER_GRADIENT_DEFAULT;
+  }
+
+  try {
+    const saved = window.localStorage.getItem(ZHILVINAS_HEADER_GRADIENT_STORAGE_KEY);
+    if (!saved) {
+      return ZHILVINAS_HEADER_GRADIENT_DEFAULT;
+    }
+
+    const parsed = JSON.parse(saved);
+    if (!parsed || typeof parsed !== "object") {
+      return ZHILVINAS_HEADER_GRADIENT_DEFAULT;
+    }
+
+    return { ...ZHILVINAS_HEADER_GRADIENT_DEFAULT, ...parsed };
+  } catch {
+    return ZHILVINAS_HEADER_GRADIENT_DEFAULT;
+  }
+}
+
+function ZhilvinasHeaderGradientTuner({ open, onOpenChange, value, onChange, onReset }) {
+  const update = (patch) => onChange({ ...value, ...patch });
+
+  return (
+    <section
+      className="w-full overflow-hidden rounded-none sm:rounded-2xl border-0 sm:border sm:border-neutral-200 bg-[#1c1c1c] text-white sm:shadow-lg"
+      aria-label="Настройка градиента шапки Жильвинаса"
+    >
+      <button
+        type="button"
+        onClick={() => onOpenChange(!open)}
+        className="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left text-[12px] font-semibold"
+      >
+        <span>Градиент оранжевой шапки</span>
+        <ChevronDown size={16} className={cx("shrink-0 transition-transform", open && "rotate-180")} aria-hidden />
+      </button>
+      {open ? (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          className="max-h-[42vh] overflow-y-auto border-t border-white/10 px-3 pb-3 pt-2"
+        >
+          <div className="space-y-2">
+            <label className="block">
+              <span className="mb-1 block text-[10px] text-white/70">Угол линейного градиента ({value.linearAngle}°)</span>
+              <input
+                type="range"
+                min={90}
+                max={270}
+                step={1}
+                value={value.linearAngle}
+                onChange={(event) => update({ linearAngle: Number(event.target.value) })}
+                className="w-full accent-[#ff6e00]"
+              />
+            </label>
+            {[
+              ["0%", "stop0"],
+              ["30%", "stop30"],
+              ["58%", "stop58"],
+              ["100%", "stop100"],
+            ].map(([label, key]) => (
+              <label key={key} className="flex items-center justify-between gap-2 text-[10px] text-white/70">
+                <span>Цвет {label}</span>
+                <input
+                  type="color"
+                  value={value[key]}
+                  onChange={(event) => update({ [key]: event.target.value })}
+                  className="h-7 w-12 cursor-pointer rounded border-0 bg-transparent p-0"
+                />
+              </label>
+            ))}
+            <label className="flex items-center justify-between gap-2 text-[10px] text-white/70">
+              <span>Блик (радиальный)</span>
+              <input
+                type="color"
+                value={value.radialColor}
+                onChange={(event) => update({ radialColor: event.target.value })}
+                className="h-7 w-12 cursor-pointer rounded border-0 bg-transparent p-0"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-[10px] text-white/70">
+                Сила блика ({Math.round(value.radialMidAlpha * 100)}%)
+              </span>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={1}
+                value={Math.round(value.radialMidAlpha * 100)}
+                onChange={(event) => update({ radialMidAlpha: Number(event.target.value) / 100 })}
+                className="w-full accent-[#ff6e00]"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-[10px] text-white/70">Позиция блика X ({value.radialX}%)</span>
+              <input
+                type="range"
+                min={50}
+                max={100}
+                step={1}
+                value={value.radialX}
+                onChange={(event) => update({ radialX: Number(event.target.value) })}
+                className="w-full accent-[#ff6e00]"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-[10px] text-white/70">Позиция блика Y ({value.radialY}%)</span>
+              <input
+                type="range"
+                min={80}
+                max={130}
+                step={1}
+                value={value.radialY}
+                onChange={(event) => update({ radialY: Number(event.target.value) })}
+                className="w-full accent-[#ff6e00]"
+              />
+            </label>
+            <label className="flex items-center justify-between gap-2 text-[10px] text-white/70">
+              <span>Sticky-середина</span>
+              <input
+                type="color"
+                value={value.stickyMid}
+                onChange={(event) => update({ stickyMid: event.target.value })}
+                className="h-7 w-12 cursor-pointer rounded border-0 bg-transparent p-0"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-[10px] text-white/70">
+                Тень ({Math.round((value.shadowAlpha ?? 0.26) * 100)}%)
+              </span>
+              <input
+                type="range"
+                min={0}
+                max={60}
+                step={1}
+                value={Math.round((value.shadowAlpha ?? 0.26) * 100)}
+                onChange={(event) => update({ shadowAlpha: Number(event.target.value) / 100 })}
+                className="w-full accent-[#ff6e00]"
+              />
+            </label>
+          </div>
+          <div className="mt-2 flex gap-2">
+            <button
+              type="button"
+              onClick={onReset}
+              className="flex-1 rounded-xl border border-white/20 px-2 py-2 text-[11px] font-medium text-white/90"
+            >
+              Сброс
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                try {
+                  navigator.clipboard.writeText(
+                    `background: ${buildZhilvinasHeaderBackground(value)}; box-shadow: ${buildZhilvinasHeaderBoxShadow(value)};`
+                  );
+                } catch {
+                  // noop
+                }
+              }}
+              className="flex-1 rounded-xl bg-[#ff6e00] px-2 py-2 text-[11px] font-semibold text-white"
+            >
+              Копировать CSS
+            </button>
+          </div>
+        </motion.div>
+      ) : null}
+    </section>
+  );
+}
 
 /**
  * Типографика оранжевой шапки Жильвинаса — один letter-spacing (normal),
@@ -652,7 +913,7 @@ function HomeSalonNearbyButton({
 }) {
   const isZhilvinasSalonRow = salonRowStyle === "zhilvinas" && !showEyebrow;
   return (
-    <div className={cx("flex items-center", compactInline ? "shrink-0 gap-1.5" : "w-full gap-1")}>
+    <div className={cx("flex items-center", compactInline ? "shrink-0 gap-1.5" : "w-full gap-2")}>
       <button
         type="button"
         onClick={() => go("salons")}
@@ -722,7 +983,7 @@ function HomeSalonNearbyButton({
     </div>
   );
 }
-function HomeQuickTilesRow({ go, variant = "feed" }) {
+function HomeQuickTilesRow({ go, variant = "feed", embedded = false }) {
   const isHeader = variant === "header";
   const isZhilvinasCatalog = variant === "zhilvinas";
   const tiles = isHeader
@@ -734,12 +995,17 @@ function HomeQuickTilesRow({ go, variant = "feed" }) {
   return (
     <div
       className={cx(
-        "-mx-4 px-4",
+        !embedded && "-mx-4 px-4",
         isHeader
           ? "mt-3 grid grid-cols-5 gap-1"
           : isZhilvinasCatalog
-            ? zhilvinasCatalogTilesRowClass
-            : "flex snap-x snap-proximity gap-2.5 overflow-x-auto scroll-px-4 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            ? cx(zhilvinasCatalogTilesRowClass, embedded && "-mx-4 scroll-px-0 pl-4 pr-4")
+            : cx(
+                "flex snap-x snap-proximity overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+                embedded
+                  ? "min-w-0 w-[400px] items-start justify-start gap-[2px] overscroll-x-contain pb-0 scroll-px-4 pl-4 pr-4 -ml-4 -mr-4"
+                  : "gap-1.5 pb-1 scroll-px-4"
+              )
       )}
     >
       {tiles.map((tile) => {
@@ -764,9 +1030,9 @@ function HomeQuickTilesRow({ go, variant = "feed" }) {
               isHeader
                 ? "focus-visible:ring-white/70 " + katyaHeaderFocusRingOffsetClass
                 : isBrandCta
-                  ? "focus-visible:ring-[#009AA6]/45 focus-visible:ring-offset-[#f7f8fa]"
+                  ? cx("focus-visible:ring-[#009AA6]/45", homeFeedFocusRingOffsetClass)
                   : isZhilvinasCatalog
-                    ? "focus-visible:ring-[#009AA6]/30 focus-visible:ring-offset-[#f7f8fa]"
+                    ? cx("focus-visible:ring-[#009AA6]/30", homeFeedFocusRingOffsetClass)
                     : "focus-visible:ring-[#ff6e00]/35 focus-visible:ring-offset-white",
               isHeader
                 ? "min-w-0 gap-1.5"
@@ -790,17 +1056,17 @@ function HomeQuickTilesRow({ go, variant = "feed" }) {
                         : tileImage
                           ? zhilvinasCatalogTileImageClass
                           : zhilvinasCatalogDefaultTileIconClass
-                    : "flex h-12 w-12 w-full shrink-0 items-center justify-center rounded-2xl border border-[#e7e9ee] bg-white p-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)]"
+                    : katyaFeedTileVisualClass
                 }
               >
                 {tileImage ? (
                   <img
                     src={tileImage}
                     alt=""
-                    className="size-full object-cover object-center"
+                    className={isZhilvinasCatalog ? "size-full object-cover object-center" : katyaFeedTileImageClass}
                     draggable={false}
                   />
-                ) : (
+                ) : Icon ? (
                   <Icon
                     className={cx(
                       isBrandCta ? "h-5 w-5 text-white" : "text-[#ff6e00]",
@@ -809,7 +1075,7 @@ function HomeQuickTilesRow({ go, variant = "feed" }) {
                     strokeWidth={isBrandCta ? 2.25 : 2}
                     aria-hidden
                   />
-                )}
+                ) : null}
               </span>
             )}
             <span
@@ -839,13 +1105,19 @@ function KatyaHomeSegmentTabs({
   segments = katyaHomeSegments,
   className,
   tabTrackingClass = "tracking-tight",
+  surface = "header",
 }) {
+  const isFeedSurface = surface === "feed";
+
   return (
     <motion.div
       role="tablist"
       aria-label="Разделы главной"
       className={cx(
-        "mt-3 flex gap-0.5 rounded-2xl bg-[#b84700]/28 p-1 ring-1 ring-inset ring-white/30 backdrop-blur-[3px]",
+        "flex gap-0.5 rounded-2xl p-1 ring-1 ring-inset",
+        isFeedSurface
+          ? "mt-0 bg-[#EFEFEC] ring-[#e0e2e7]"
+          : "mt-3 bg-[#b84700]/28 ring-white/30 backdrop-blur-[3px]",
         className
       )}
     >
@@ -863,9 +1135,15 @@ function KatyaHomeSegmentTabs({
               "relative z-0 flex min-h-9 min-w-0 flex-1 items-center justify-center rounded-[10px] px-2 py-2",
               "text-[11px] font-semibold leading-none transition-colors duration-200",
               tabTrackingClass,
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2",
-              katyaHeaderFocusRingOffsetClass,
-              active ? "text-[#1c1c1c]" : "text-white/90 hover:text-white"
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+              isFeedSurface
+                ? cx("focus-visible:ring-[#ff6e00]/35", homeFeedFocusRingOffsetClass)
+                : cx("focus-visible:ring-white/80", katyaHeaderFocusRingOffsetClass),
+              active
+                ? "text-[#1c1c1c]"
+                : isFeedSurface
+                  ? "text-neutral-600 hover:text-neutral-800"
+                  : "text-white/90 hover:text-white"
             )}
           >
             {active && (
@@ -880,6 +1158,42 @@ function KatyaHomeSegmentTabs({
         );
       })}
     </motion.div>
+  );
+}
+
+/** Chip-табы подборок товаров — без серой «капсулы», в акценте бренда Жильвинаса. */
+function ZhilvinasProductFeedTabs({ value, onChange }) {
+  return (
+    <div
+      role="tablist"
+      aria-label="Подборки товаров"
+      className="-mx-4 flex gap-1.5 overflow-x-auto pl-4 pr-4 pt-1.5 pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+    >
+      {zhilvinasHomeProductTabs.map((tab) => {
+        const active = value === tab.id;
+
+        return (
+          <button
+            key={tab.id}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            onClick={() => onChange(tab.id)}
+            className={cx(
+              "relative shrink-0 whitespace-nowrap rounded-full px-3.5 py-2",
+              "text-[13px] leading-none transition-[color,box-shadow,background-color] duration-200",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#009AA6]/40 focus-visible:ring-offset-2",
+              homeFeedFocusRingOffsetClass,
+              active
+                ? "bg-white font-semibold text-[#007a84] shadow-[0_2px_8px_rgba(0,154,166,0.12)] ring-1 ring-[#c5e8eb]"
+                : "bg-transparent font-medium text-neutral-600 hover:bg-white/60 hover:text-[#1c1c1c]"
+            )}
+          >
+            {tab.label}
+          </button>
+        );
+      })}
+    </div>
   );
 }
 
@@ -934,15 +1248,28 @@ function PhoneStatusBar({ className }) {
   );
 }
 
-function PhoneShell({ children }) {
+function PhoneShell({ children, katyaAuthPromptVisible = false, sidePanel = null }) {
   return (
-    <div className="h-dvh sm:h-auto sm:min-h-screen w-full bg-white sm:bg-neutral-100 sm:flex sm:items-center sm:justify-center sm:p-4 font-sans text-[#1c1c1c]">
-      <div className="h-full w-full sm:w-[392px] sm:max-w-full sm:h-[820px] sm:bg-neutral-950 sm:rounded-[44px] sm:p-2 sm:shadow-2xl">
-        <div className="h-full w-full bg-white sm:rounded-[32px] overflow-hidden relative">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-neutral-950 rounded-b-2xl z-50 hidden sm:block" />
+    <div className="flex h-dvh min-h-0 w-full flex-col bg-white font-sans text-[#1c1c1c] sm:h-auto sm:min-h-screen sm:flex-row sm:items-center sm:justify-center sm:gap-5 sm:bg-neutral-100 sm:p-4">
+      <div className="flex min-h-0 w-full flex-1 flex-col sm:h-[820px] sm:w-[392px] sm:max-w-full sm:flex-none sm:rounded-[44px] sm:bg-neutral-950 sm:p-2 sm:shadow-2xl">
+        <div
+          data-phone-frame
+          data-katya-auth-prompt={katyaAuthPromptVisible ? "true" : "false"}
+          className={cx(
+            "relative flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-white sm:rounded-[32px]",
+            "data-[katya-auth-prompt=true]:[&_[data-scroll-root]:not(.scroll-pb-24)]:!pb-[7.75rem]",
+            "data-[katya-auth-prompt=true]:[&_[data-scroll-root].scroll-pb-24]:!pb-[8.75rem]"
+          )}
+        >
+          <div className="absolute top-0 left-1/2 z-50 hidden h-6 w-32 -translate-x-1/2 rounded-b-2xl bg-neutral-950 sm:block" />
           {children}
         </div>
       </div>
+      {sidePanel ? (
+        <aside className="max-h-[min(42vh,320px)] w-full shrink-0 overflow-hidden border-t border-neutral-200 bg-white sm:max-h-[min(820px,calc(100vh-2rem))] sm:w-80 sm:overflow-y-auto sm:rounded-2xl sm:border sm:border-neutral-200 sm:shadow-lg">
+          {sidePanel}
+        </aside>
+      ) : null}
     </div>
   );
 }
@@ -972,9 +1299,68 @@ function Header({ title, subtitle, onBack, right }) {
   );
 }
 
-function BottomNav({ screen, go, homeProfileCustomer, setHomeProfileCustomer }) {
+function KatyaAuthPromptStrip({ onDismiss, onAuthorize }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+      role="region"
+      aria-label="Вход в аккаунт"
+      className="overflow-hidden border-t border-[#ffe4cc] bg-[linear-gradient(180deg,#FFF9F4_0%,#FFF5ED_100%)]"
+    >
+      <div className="flex items-center gap-2 px-3 py-2.5">
+        <p className="mx-2 min-w-0 flex-1 text-[12px] leading-[1.35] text-[#1c1c1c]">
+          <button
+            type="button"
+            onClick={onAuthorize}
+            className="!font-semibold text-[#ff6e00] transition-colors hover:text-[#f06810] active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6e00]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[#fff5ed] rounded-sm"
+          >
+            Войдите
+          </button>
+          <span className="text-neutral-600"> — не пропустите бонусы</span>
+        </p>
+        <button
+          type="button"
+          onClick={onAuthorize}
+          aria-label="Войти в аккаунт"
+          className="flex shrink-0 items-center justify-center transition-transform hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6e00]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[#fff5ed] rounded-sm"
+        >
+          <img
+            src={pointsLogo}
+            srcSet={`${pointsLogo} 1x, ${pointsLogo2x} 2x`}
+            alt=""
+            className="h-7 w-7 object-contain"
+            width={28}
+            height={28}
+            decoding="async"
+          />
+        </button>
+        <button
+          type="button"
+          onClick={onDismiss}
+          aria-label="Закрыть"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[18px] font-light leading-none text-neutral-400 transition-colors hover:bg-black/[0.04] hover:text-neutral-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6e00]/25"
+        >
+          ×
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
+function BottomNav({
+  screen,
+  go,
+  homeProfileCustomer,
+  setHomeProfileCustomer,
+  showKatyaAuthPrompt,
+  onDismissKatyaAuthPrompt,
+}) {
   const [homeProfilePickerOpen, setHomeProfilePickerOpen] = useState(false);
   const homeTabProfileSwitch = screen === "home";
+  const isKatyaProfile = homeProfileCustomer === "Катя";
 
   useEffect(() => {
     if (!homeProfilePickerOpen) {
@@ -1006,11 +1392,9 @@ function BottomNav({ screen, go, homeProfileCustomer, setHomeProfileCustomer }) 
   ];
 
   return (
-    <nav
+    <div
       data-bottom-nav-root
-      className="absolute bottom-0 left-0 right-0 z-40 bg-white px-2 pt-1 shadow-[0_-4px_8px_rgba(0,0,0,0.08)]"
-      style={{ paddingBottom: "max(env(safe-area-inset-bottom), 6px)" }}
-      aria-label="Основная навигация"
+      className="absolute bottom-0 left-0 right-0 z-40 flex flex-col shadow-[0_-4px_8px_rgba(0,0,0,0.08)]"
     >
       {homeProfilePickerOpen && (
         <div
@@ -1039,6 +1423,20 @@ function BottomNav({ screen, go, homeProfileCustomer, setHomeProfileCustomer }) 
           ))}
         </div>
       )}
+      <AnimatePresence initial={false}>
+        {showKatyaAuthPrompt && isKatyaProfile ? (
+          <KatyaAuthPromptStrip
+            key="katya-auth-prompt"
+            onDismiss={onDismissKatyaAuthPrompt}
+            onAuthorize={() => go("profile")}
+          />
+        ) : null}
+      </AnimatePresence>
+      <nav
+        className="bg-white px-2 pt-1"
+        style={{ paddingBottom: "max(env(safe-area-inset-bottom), 6px)" }}
+        aria-label="Основная навигация"
+      >
       <div className="flex h-[52px] w-full items-center justify-around">
         {items.map((item) => {
           const active = screen === item.id;
@@ -1093,7 +1491,8 @@ function BottomNav({ screen, go, homeProfileCustomer, setHomeProfileCustomer }) 
         })}
       </div>
       <div aria-hidden="true" className="mx-auto mb-1 mt-0.5 h-1 w-[124px] rounded-full bg-[#1c1c1c]/20" />
-    </nav>
+      </nav>
+    </div>
   );
 }
 
@@ -1110,7 +1509,7 @@ function SearchBar({ value, onChange, onFocus, smartRibbon, marqueePlaceholder, 
   }, []);
 
   const defaultPlaceholder = smartRibbon
-    ? "Умный поиск — размер, подсказки и наличие рядом"
+    ? "Умный поиск"
     : "Найти стельки, бандаж, ортез или обувь";
   const placeholderText = marqueePlaceholder ?? defaultPlaceholder;
   const showMarquee = Boolean(marqueePlaceholder) && !value && !isFocused && !prefersReducedMotion;
@@ -1205,7 +1604,8 @@ function ProductVisual({ label, image, large = false }) {
     return (
       <div
         className={cx(
-          "rounded-2xl bg-[#f7f8fa] overflow-hidden shrink-0 flex items-center justify-center",
+          "rounded-2xl overflow-hidden shrink-0 flex items-center justify-center",
+          homeFeedSurfaceMutedClass,
           large ? "h-64 w-full" : "w-24 h-24"
         )}
       >
@@ -1230,6 +1630,52 @@ function ProductVisual({ label, image, large = false }) {
       <Footprints className="text-[#ff6e00]" size={large ? 86 : 34} />
       <div className="text-xs text-neutral-600 mt-2">{label}</div>
     </div>
+  );
+}
+
+function HomeFeedProductCard({ product, onOpen, showFavorite, isFavorite, onToggleFavorite }) {
+  return (
+    <motion.div layout className="relative h-full min-w-0 w-full">
+      <button
+        type="button"
+        onClick={() => onOpen(product)}
+        className="flex h-full min-h-0 w-full flex-col rounded-2xl border border-[#e7e9ee] bg-white p-3 text-left shadow-[0_4px_14px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-transform duration-150"
+      >
+        <div className="relative flex min-h-[120px] min-w-0 flex-1 flex-col overflow-hidden rounded-xl bg-white">
+          {product.image ? (
+            <img
+              src={product.image}
+              alt=""
+              className="h-full w-full object-contain object-center"
+              loading="lazy"
+              decoding="async"
+            />
+          ) : (
+            <div className="flex flex-1 items-center justify-center">
+              <Footprints size={28} className="text-[#ff6e00]" />
+            </div>
+          )}
+        </div>
+        <div className="mt-2.5 shrink-0 text-[13px] font-normal leading-[1.3] text-[#1c1c1c] line-clamp-2">{product.title}</div>
+        <div className="mt-1.5 shrink-0 text-base font-semibold text-[#1c1c1c]">{product.price}</div>
+      </button>
+      {showFavorite ? (
+        <button
+          type="button"
+          aria-label={isFavorite ? "Убрать из избранного" : "Добавить в избранное"}
+          aria-pressed={isFavorite}
+          onClick={() => onToggleFavorite(product.id)}
+          className="absolute top-5 right-5 z-10 p-0.5 transition-[color,transform] duration-150 active:scale-95"
+        >
+          <Heart
+            size={20}
+            strokeWidth={1.5}
+            className={isFavorite ? "text-[#ff6e00]" : "text-[#A1A1A1]"}
+            fill={isFavorite ? "currentColor" : "none"}
+          />
+        </button>
+      ) : null}
+    </motion.div>
   );
 }
 
@@ -1259,10 +1705,21 @@ function ProductCard({ product, onOpen, compact = false }) {
   );
 }
 
-function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustomer, setHomeProfileCustomer }) {
+function HomeScreen({
+  go,
+  setSelectedProduct,
+  setSearchValue,
+  homeProfileCustomer,
+  setHomeProfileCustomer,
+  zhilvinasHeaderGradient,
+  katyaIsAuthenticated = true,
+  onKatyaAuthorize,
+}) {
   const [customerMenuOpen, setCustomerMenuOpen] = useState(false);
   const [katyaLoyaltyTierOpen, setKatyaLoyaltyTierOpen] = useState(false);
   const [katyaHomeSegment, setKatyaHomeSegment] = useState("home");
+  const [zhilvinasProductTab, setZhilvinasProductTab] = useState("for-you");
+  const [homeFavoriteIds, setHomeFavoriteIds] = useState(() => new Set());
   const [katyaStickyPinned, setKatyaStickyPinned] = useState(false);
   const katyaStickySearchRef = useRef(null);
   const sectionTitleClass = "text-[15px] font-semibold text-[#1c1c1c]";
@@ -1281,14 +1738,51 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
   const isLeshaLayoutBody = isLeshaLayoutBodyProfile(homeProfileCustomer);
   const isKatyaFlatHeader = isKatyaHome || isZhilvinasProfile;
   const isKatyaProfile = homeProfileCustomer === "Катя";
+  const showKatyaLoyaltyGuest = isKatyaProfile && !katyaIsAuthenticated;
   const usesHomeSegments = isKatyaProfile || isZhilvinasProfile;
+  const showHomeProductFavorites = isKatyaProfile || isZhilvinasProfile;
+
+  const toggleHomeFavorite = (productId) => {
+    setHomeFavoriteIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(productId)) {
+        next.delete(productId);
+      } else {
+        next.add(productId);
+      }
+      return next;
+    });
+  };
   const isKatyaHomeSegment = !usesHomeSegments || katyaHomeSegment === "home";
+
+  const visibleHomeProducts = useMemo(() => {
+    if (!isZhilvinasProfile) {
+      return homeFeaturedProducts;
+    }
+    const ids =
+      zhilvinasHomeProductCollectionIds[zhilvinasProductTab] ?? homeFeaturedProductIds;
+    return productsByIds(ids);
+  }, [isZhilvinasProfile, zhilvinasProductTab]);
+
+  const zhilvinasHeaderShellStyle = useMemo(
+    () => ({
+      background: buildZhilvinasHeaderBackground(zhilvinasHeaderGradient),
+      boxShadow: buildZhilvinasHeaderBoxShadow(zhilvinasHeaderGradient),
+    }),
+    [zhilvinasHeaderGradient]
+  );
 
   useEffect(() => {
     if (!usesHomeSegments && katyaHomeSegment !== "home") {
       setKatyaHomeSegment("home");
     }
   }, [usesHomeSegments, katyaHomeSegment]);
+
+  useEffect(() => {
+    if (showKatyaLoyaltyGuest && katyaLoyaltyTierOpen) {
+      setKatyaLoyaltyTierOpen(false);
+    }
+  }, [showKatyaLoyaltyGuest, katyaLoyaltyTierOpen]);
 
   useEffect(() => {
     if (!usesHomeSegments) {
@@ -1324,8 +1818,113 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
     slider.scrollTo({ left: Math.max(0, targetLeft), behavior: "auto" });
   }, []);
 
+  const katyaUnifiedHomeFeed =
+    isKatyaProfile && isKatyaHome && isKatyaHomeSegment;
+  const zhilvinasUnifiedHomeFeed =
+    isZhilvinasProfile && usesHomeSegments && isKatyaHomeSegment;
+
+  const renderKatyaStickySearchPanel = ({ zhilvinasInHeaderShell = false } = {}) => {
+    if (!usesHomeSegments) {
+      return null;
+    }
+    if (isZhilvinasProfile && zhilvinasUnifiedHomeFeed && !zhilvinasInHeaderShell) {
+      return null;
+    }
+
+    return (
+    <motion.div
+      ref={zhilvinasInHeaderShell ? undefined : katyaStickySearchRef}
+      className={cx(
+        isZhilvinasProfile
+          ? zhilvinasInHeaderShell
+            ? "pb-4 pt-0"
+            : cx(
+                "sticky top-0 z-40 px-4 pb-4 pt-3",
+                katyaStickyPinned
+                  ? cx("border-b rounded-b-3xl", katyaHeaderShellEdgeClass)
+                  : "bg-transparent"
+              )
+          : cx(
+              katyaHeaderGradientClass,
+              "sticky top-0 z-40 shadow-none",
+              katyaUnifiedHomeFeed
+                ? "-mx-4 px-4 pb-4"
+                : "-mx-4 -mt-4 px-4 pb-4",
+              katyaStickyPinned
+                ? "pt-[max(1rem,calc(env(safe-area-inset-top,0px)+0.75rem))] sm:pt-16"
+                : "pt-4",
+              cx("border-b rounded-b-3xl", katyaHeaderShellEdgeClass)
+            )
+      )}
+      style={
+        isZhilvinasProfile && katyaStickyPinned && !zhilvinasInHeaderShell
+          ? {
+              background: buildZhilvinasStickyBackground(zhilvinasHeaderGradient),
+              boxShadow: buildZhilvinasHeaderBoxShadow(zhilvinasHeaderGradient),
+            }
+          : undefined
+      }
+    >
+      {isZhilvinasProfile ? (
+        <div className="flex min-w-0 flex-col gap-3">
+          <HomeSalonNearbyButton
+            go={go}
+            homeEyebrow11={homeEyebrow11}
+            showEyebrow={false}
+            salonRowStyle="zhilvinas"
+          />
+          <SearchBar
+            value=""
+            onChange={(value) => {
+              setSearchValue(value);
+              go("catalog", { category: "all" });
+            }}
+            onFocus={() => go("catalog", { category: "all" })}
+            marqueePlaceholder={zhilvinasSearchMarqueePlaceholder}
+            inputClassName={zhilvinasHeaderTrackingClass}
+          />
+        </div>
+      ) : (
+        <>
+          <SearchBar
+            value=""
+            onChange={(value) => {
+              setSearchValue(value);
+              go("catalog", { category: "all" });
+            }}
+            onFocus={() => go("catalog", { category: "all" })}
+            smartRibbon={isKatyaProfile}
+          />
+          <div className="mt-3">
+            <KatyaHomeSegmentTabs
+              value={katyaHomeSegment}
+              onChange={setKatyaHomeSegment}
+              segments={katyaHomeSegments}
+              layoutId="katya-home-segment-pill"
+            />
+          </div>
+        </>
+      )}
+    </motion.div>
+    );
+  };
+
+  const katyaStickySearchPanel = renderKatyaStickySearchPanel();
+
+  const zhilvinasHomeSegmentTabs = (
+    <KatyaHomeSegmentTabs
+      value={katyaHomeSegment}
+      onChange={setKatyaHomeSegment}
+      segments={zhilvinasHomeSegments}
+      layoutId="zhilvinas-home-segment-pill"
+      className="mt-0"
+      tabTrackingClass={zhilvinasHeaderTrackingClass}
+      surface={zhilvinasUnifiedHomeFeed ? "feed" : "header"}
+    />
+  );
+
   return (
-    <div className="h-full overflow-y-auto overflow-x-hidden pb-20 bg-[#f7f8fa]">
+    <div className={cx("h-full overflow-y-auto overflow-x-hidden pb-20 data-scroll-root", homeFeedBackgroundClass)}>
       <div
         className={cx(
           "px-4 pb-4 flex flex-col gap-4",
@@ -1378,11 +1977,12 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
           </div>
         )}
 
-        <div
+        <motion.div
           className={cx(
-            isZhilvinasProfile && usesHomeSegments && zhilvinasUnifiedHeaderShellClass,
+            isZhilvinasProfile && usesHomeSegments && zhilvinasUnifiedHeaderShellLayoutClass,
             !(isZhilvinasProfile && usesHomeSegments) && "contents"
           )}
+          style={isZhilvinasProfile && usesHomeSegments ? zhilvinasHeaderShellStyle : undefined}
         >
         {isKatyaFlatHeader && isZhilvinasProfile && usesHomeSegments ? <PhoneStatusBar /> : null}
         <section
@@ -1393,7 +1993,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                   katyaHeaderGradientClass
                 )
               : isZhilvinasProfile && usesHomeSegments
-                ? "border-0 bg-transparent px-4 pb-1 pt-0 text-white"
+                ? "border-0 bg-transparent px-4 pb-1 pt-1 text-white"
                 : cx(
                     "-mx-4 border-x-0 border-b px-4 text-white",
                     katyaHeaderGradientClass,
@@ -1444,14 +2044,9 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
               <HomeSalonNearbyButton go={go} homeEyebrow11={homeEyebrow11} />
             )
           ) : isZhilvinasProfile && usesHomeSegments ? (
-            <KatyaHomeSegmentTabs
-              value={katyaHomeSegment}
-              onChange={setKatyaHomeSegment}
-              segments={zhilvinasHomeSegments}
-              layoutId="zhilvinas-home-segment-pill"
-              className="mt-0"
-              tabTrackingClass={zhilvinasHeaderTrackingClass}
-            />
+            zhilvinasUnifiedHomeFeed
+              ? renderKatyaStickySearchPanel({ zhilvinasInHeaderShell: true })
+              : zhilvinasHomeSegmentTabs
           ) : isZhilvinasProfile ? (
             <HomeSalonNearbyButton
               go={go}
@@ -1488,6 +2083,51 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
 
           {isKatyaHome && (
               <div className={cx("mt-3 space-y-1.5", !isKatyaProfile && "pb-4")}>
+                {showKatyaLoyaltyGuest ? (
+                  <button
+                    type="button"
+                    onClick={onKatyaAuthorize}
+                    className={cx(
+                      "flex w-full flex-col gap-1.5 overflow-hidden rounded-xl border border-[#ffd3b0] bg-white px-1.5 py-2 text-left shadow-[0_3px_10px_rgba(0,0,0,0.08)]",
+                      "cursor-pointer transition-opacity active:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6e00]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                    )}
+                    aria-label="Войдите, чтобы видеть бонусы и QR-код"
+                  >
+                    <div className="flex min-h-[50px] items-stretch pointer-events-none select-none">
+                      <div className="flex shrink-0 items-center pl-1.5 pr-2">
+                        <div className="flex items-baseline justify-start gap-2 text-2xl font-medium tabular-nums leading-none tracking-tight text-[#1c1c1c] blur-[6px]">
+                          <span>1 240</span>
+                          <img
+                            src={pointsLogo}
+                            srcSet={`${pointsLogo} 1x, ${pointsLogo2x} 2x`}
+                            alt=""
+                            className="h-[0.69em] w-[0.69em] shrink-0 object-contain -translate-y-[0.05em]"
+                            width={15}
+                            height={15}
+                            decoding="async"
+                          />
+                        </div>
+                      </div>
+                      <div className="mx-1.5 h-5 w-px shrink-0 self-center bg-[#e0e2e7] opacity-60" aria-hidden />
+                      <div className="flex min-w-0 flex-1 flex-col justify-center px-3 py-1">
+                        <p className="text-[12px] leading-[1.35] text-[#1c1c1c]">
+                          <span className="font-semibold text-[#ff6e00]">Войдите</span>
+                          <span className="text-neutral-600"> — баллы, сгорание и QR</span>
+                        </p>
+                      </div>
+                      <div className="ml-2.5 mr-4 h-5 w-px shrink-0 self-center bg-[#e0e2e7] opacity-60" aria-hidden />
+                      <div className="flex w-10 shrink-0 items-center justify-center self-stretch pl-0 pr-0.5">
+                        <img
+                          src={homeQrImage}
+                          alt=""
+                          className="block aspect-square h-10 w-10 min-h-10 min-w-10 shrink-0 rounded-lg object-cover p-1 shadow-[0_2px_6px_rgba(0,0,0,0.06)] blur-[6px]"
+                          width={40}
+                          height={40}
+                        />
+                      </div>
+                    </div>
+                  </button>
+                ) : (
                 <div className="flex flex-col gap-1.5 overflow-hidden rounded-xl border border-[#ffd3b0] bg-white px-1.5 py-2 shadow-[0_3px_10px_rgba(0,0,0,0.08)]">
                   <div className="flex min-h-[50px] items-stretch">
                     <button
@@ -1497,15 +2137,15 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                         "cursor-pointer rounded-lg border-0 bg-transparent p-0 font-inherit text-[#1c1c1c]",
                         "transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6e00]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
                       )}
-                    aria-expanded={katyaLoyaltyTierOpen}
-                    aria-controls={katyaLoyaltyTierOpen ? "home-katya-loyalty-tier" : undefined}
-                    aria-label={
-                      katyaLoyaltyTierOpen
-                        ? "Скрыть блок уровня программы лояльности"
-                        : "Показать блок уровня программы лояльности"
-                    }
-                    onClick={() => setKatyaLoyaltyTierOpen((open) => !open)}
-                  >
+                      aria-expanded={katyaLoyaltyTierOpen}
+                      aria-controls={katyaLoyaltyTierOpen ? "home-katya-loyalty-tier" : undefined}
+                      aria-label={
+                        katyaLoyaltyTierOpen
+                          ? "Скрыть блок уровня программы лояльности"
+                          : "Показать блок уровня программы лояльности"
+                      }
+                      onClick={() => setKatyaLoyaltyTierOpen((open) => !open)}
+                    >
                       <div
                         className="flex items-baseline justify-start gap-2 text-2xl font-medium tabular-nums leading-none tracking-tight text-[#1c1c1c]"
                         aria-label="На счёте 1 240 баллов"
@@ -1599,6 +2239,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                       </div>
                   ) : null}
                 </div>
+                )}
               </div>
           )}
 
@@ -1646,75 +2287,8 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
 
         </section>
 
-        {usesHomeSegments && (
-          <motion.div
-            ref={katyaStickySearchRef}
-            className={cx(
-              isZhilvinasProfile
-                ? cx(
-                    "sticky top-0 z-40 px-4 pb-4 pt-3",
-                    katyaStickyPinned
-                      ? cx(
-                          katyaHeaderStickySurfaceClass,
-                          "border-b rounded-b-3xl",
-                          katyaHeaderShellEdgeClass,
-                          katyaHeaderShellShadowClass
-                        )
-                      : "bg-transparent"
-                  )
-                : cx(
-                    katyaHeaderGradientClass,
-                    "sticky top-0 z-40 -mx-4 -mt-4 px-4 pb-4",
-                    katyaStickyPinned
-                      ? "pt-[max(1rem,calc(env(safe-area-inset-top,0px)+0.75rem))] sm:pt-16"
-                      : "pt-4",
-                    cx("border-b rounded-b-3xl", katyaHeaderShellEdgeClass, katyaHeaderShellShadowClass)
-                  )
-            )}
-          >
-            {isZhilvinasProfile ? (
-              <div className="flex min-w-0 flex-col gap-3">
-                <HomeSalonNearbyButton
-                  go={go}
-                  homeEyebrow11={homeEyebrow11}
-                  showEyebrow={false}
-                  salonRowStyle="zhilvinas"
-                />
-                <SearchBar
-                  value=""
-                  onChange={(value) => {
-                    setSearchValue(value);
-                    go("catalog", { category: "all" });
-                  }}
-                  onFocus={() => go("catalog", { category: "all" })}
-                  marqueePlaceholder={zhilvinasSearchMarqueePlaceholder}
-                  inputClassName={zhilvinasHeaderTrackingClass}
-                />
-              </div>
-            ) : (
-              <>
-                <SearchBar
-                  value=""
-                  onChange={(value) => {
-                    setSearchValue(value);
-                    go("catalog", { category: "all" });
-                  }}
-                  onFocus={() => go("catalog", { category: "all" })}
-                  smartRibbon={isKatyaProfile}
-                />
-                <div className="mt-3">
-                  <KatyaHomeSegmentTabs
-                    value={katyaHomeSegment}
-                    onChange={setKatyaHomeSegment}
-                    segments={katyaHomeSegments}
-                    layoutId="katya-home-segment-pill"
-                  />
-                </div>
-              </>
-            )}
-          </motion.div>
-        )}
-        </div>
+        {usesHomeSegments && !katyaUnifiedHomeFeed && !zhilvinasUnifiedHomeFeed && katyaStickySearchPanel}
+        </motion.div>
 
         {usesHomeSegments && katyaHomeSegment === "med-center" && (
           <section className="min-w-0 space-y-3">
@@ -1764,10 +2338,12 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
 
         {isKatyaHomeSegment && (
         <>
-        {!isZhilvinasProfile && (
-        <div className="-mx-4">
-          <div className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [-ms-overflow-style:none]">
-          {prioritizedOrderItems.map((item) => {
+        {isKatyaHome && !isZhilvinasProfile ? (
+          <section className={cx(katyaHomeFeedStackClass, "-mb-1", katyaUnifiedHomeFeed && "-mt-4 pt-0")}>
+            {katyaUnifiedHomeFeed && katyaStickySearchPanel}
+            <div className="-mx-4">
+              <div className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none]">
+              {prioritizedOrderItems.map((item) => {
             const statusMeta = getHomeOrderStatusMeta(item.tone);
             const isReady = item.tone === "ready";
 
@@ -1796,7 +2372,7 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
                   height={44}
                 />
               </div>
-              <div className="ml-2 flex min-w-0 flex-1 gap-2.5 rounded-2xl bg-white p-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+              <div className="ml-2 flex min-w-0 flex-1 gap-2.5 rounded-2xl border border-[#e7e9ee] bg-white p-2.5">
                 <div className="flex h-full w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white p-1">
                   {item.image ? (
                     <img
@@ -1831,48 +2407,167 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
               </div>
             </motion.div>
             );
-          })}
-          </div>
-        </div>
-        )}
+              })}
+              </div>
+            </div>
+            <motion.div
+              ref={promoSliderRef}
+              className="-mx-4 flex min-w-0 justify-center snap-x snap-proximity overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden gap-2 px-[17px]"
+            >
+              {promoCards.map((promo) => (
+                <button
+                  type="button"
+                  key={promo.id}
+                  onClick={() => go("catalog", { category: "all" })}
+                  className="relative isolate block h-[130px] min-h-0 min-w-0 shrink-0 grow-0 basis-full snap-center overflow-hidden rounded-2xl bg-[#dfe3e8] cursor-pointer"
+                >
+                  <img
+                    src={promo.image}
+                    alt=""
+                    className="pointer-events-none absolute inset-0 size-full object-cover select-none"
+                    draggable={false}
+                  />
+                  <span className="sr-only">{promo.title}</span>
+                </button>
+              ))}
+            </motion.div>
+            <HomeQuickTilesRow go={go} variant="feed" embedded />
+          </section>
+        ) : zhilvinasUnifiedHomeFeed ? (
+          <section className={cx(katyaHomeFeedStackClass, "-mb-1", "-mt-4 pt-3")}>
+            {zhilvinasHomeSegmentTabs}
+            <motion.div
+              ref={promoSliderRef}
+              className="-mx-4 flex min-w-0 justify-center snap-x snap-proximity overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden gap-2 px-[17px]"
+            >
+              {promoCards.map((promo) => (
+                <button
+                  type="button"
+                  key={promo.id}
+                  onClick={() => go("catalog", { category: "all" })}
+                  className="relative isolate block h-[130px] min-h-0 min-w-0 shrink-0 grow-0 basis-full snap-center overflow-hidden rounded-2xl bg-[#dfe3e8] cursor-pointer"
+                >
+                  <img
+                    src={promo.image}
+                    alt=""
+                    className="pointer-events-none absolute inset-0 size-full object-cover select-none"
+                    draggable={false}
+                  />
+                  <span className="sr-only">{promo.title}</span>
+                </button>
+              ))}
+            </motion.div>
+            <HomeQuickTilesRow go={go} variant="zhilvinas" embedded />
+          </section>
+        ) : (
+          <>
+            {!isZhilvinasProfile && (
+            <div className="-mx-4">
+              <div className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none]">
+              {prioritizedOrderItems.map((item) => {
+                const statusMeta = getHomeOrderStatusMeta(item.tone);
+                const isReady = item.tone === "ready";
 
-        <section className={cx("min-w-0", usesHomeSegments ? "pb-0 -mx-4" : "pb-1.5")}>
-          <motion.div
-            ref={promoSliderRef}
-            className={cx(
-              "flex min-w-0 snap-x snap-proximity overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
-              usesHomeSegments ? "gap-2 px-[17px]" : "gap-3"
+                return (
+                <motion.div
+                  key={item.id}
+                  role="button"
+                  tabIndex={0}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => go("order")}
+                  className="box-border flex w-full min-w-full shrink-0 snap-start snap-always cursor-pointer items-stretch pl-4 pr-4"
+                  aria-label={`${statusMeta.label}. ${item.title}. ${item.address}. ${item.timing}`}
+                >
+                  <div
+                    className={cx(
+                      "-ml-4 flex w-[64px] shrink-0 items-center justify-center rounded-r-2xl rounded-l-none py-3 pl-2.5 pr-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]",
+                      statusMeta.qrPanelClass,
+                      isReady && "ring-1 ring-inset ring-[#bbf7d0]"
+                    )}
+                  >
+                    <img
+                      src={homeQrImage}
+                      alt=""
+                      className="size-11 shrink-0 aspect-square rounded-lg object-contain"
+                      width={44}
+                      height={44}
+                    />
+                  </div>
+                  <div className="ml-2 flex min-w-0 flex-1 gap-2.5 rounded-2xl border border-[#e7e9ee] bg-white p-2.5">
+                    <div className="flex h-full w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white p-1">
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt=""
+                          className="max-h-full max-w-full object-contain object-center"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center">
+                          <ShoppingBag size={20} className="text-neutral-300" aria-hidden />
+                        </div>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex flex-1 flex-col justify-center gap-1 py-0.5">
+                      <HomeOrderStatusPill tone={item.tone} label={item.statusLabel} />
+                      <p className="flex min-w-0 items-center gap-1.5 text-[15px] font-semibold tracking-tight text-[#1c1c1c]">
+                        {item.kind ? (
+                          <span className="flex h-[1.25em] shrink-0 items-center">
+                            <HomeOrderDeliveryKindIcon
+                              kind={item.kind}
+                              className="block h-[1em] w-[1em] text-[#1c1c1c]"
+                            />
+                          </span>
+                        ) : null}
+                        <span className="min-w-0 truncate leading-[1.25]">{item.title}</span>
+                      </p>
+                      <p className="min-w-0 truncate text-xs leading-4 text-neutral-500">{item.address}</p>
+                      <p className={cx("text-sm leading-5", statusMeta.timingClass)}>{item.timing}</p>
+                    </div>
+                  </div>
+                </motion.div>
+                );
+              })}
+              </div>
+            </div>
             )}
-          >
-            {promoCards.map((promo) => (
-              <button
-                type="button"
-                key={promo.id}
-                onClick={() => go("catalog", { category: "all" })}
-                className="relative isolate block h-[130px] min-h-0 min-w-0 shrink-0 grow-0 basis-full snap-center overflow-hidden rounded-2xl bg-[#dfe3e8] cursor-pointer"
+
+            {!isZhilvinasProfile && (
+            <section className={cx("min-w-0", usesHomeSegments ? "pb-0 -mx-4" : "pb-1.5")}>
+              <motion.div
+                ref={promoSliderRef}
+                className={cx(
+                  "flex min-w-0 snap-x snap-proximity overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+                  usesHomeSegments ? "gap-2 px-[17px]" : "gap-3"
+                )}
               >
-                <img
-                  src={promo.image}
-                  alt=""
-                  className="pointer-events-none absolute inset-0 size-full object-cover select-none"
-                  draggable={false}
-                />
-                <span className="sr-only">{promo.title}</span>
-              </button>
-            ))}
-          </motion.div>
-        </section>
+                {promoCards.map((promo) => (
+                  <button
+                    type="button"
+                    key={promo.id}
+                    onClick={() => go("catalog", { category: "all" })}
+                    className="relative isolate block h-[130px] min-h-0 min-w-0 shrink-0 grow-0 basis-full snap-center overflow-hidden rounded-2xl bg-[#dfe3e8] cursor-pointer"
+                  >
+                    <img
+                      src={promo.image}
+                      alt=""
+                      className="pointer-events-none absolute inset-0 size-full object-cover select-none"
+                      draggable={false}
+                    />
+                    <span className="sr-only">{promo.title}</span>
+                  </button>
+                ))}
+              </motion.div>
+            </section>
+            )}
 
-        {isZhilvinasProfile && (
-          <section className="min-w-0">
-            <HomeQuickTilesRow go={go} variant="zhilvinas" />
-          </section>
-        )}
-
-        {isKatyaHome && (
-          <section className={cx("min-w-0", isKatyaProfile && "-mt-1")}>
-            <HomeQuickTilesRow go={go} variant="feed" />
-          </section>
+            {isKatyaHome && !isZhilvinasProfile && (
+              <section className="min-w-0">
+                <HomeQuickTilesRow go={go} variant="feed" />
+              </section>
+            )}
+          </>
         )}
 
         {isLeshaLayoutBody && (
@@ -1989,34 +2684,31 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
           </>
         )}
 
-        <section className="min-w-0">
-          <div className="grid grid-cols-2 gap-3">
-              {homeFeaturedProducts.map((product) => (
-                <button
-                  type="button"
+        <section className={cx("min-w-0", isZhilvinasProfile && "space-y-2")}>
+          {isZhilvinasProfile ? (
+            <ZhilvinasProductFeedTabs value={zhilvinasProductTab} onChange={setZhilvinasProductTab} />
+          ) : null}
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={isZhilvinasProfile ? zhilvinasProductTab : "default"}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="grid grid-cols-2 items-stretch gap-1 -mx-4"
+            >
+              {visibleHomeProducts.map((product) => (
+                <HomeFeedProductCard
                   key={product.id}
-                  onClick={() => {
-                    setSelectedProduct(product);
+                  product={product}
+                  onOpen={(nextProduct) => {
+                    setSelectedProduct(nextProduct);
                     go("product");
                   }}
-                  className="min-w-0 w-full rounded-2xl border border-[#e7e9ee] bg-white p-3 text-left shadow-[0_4px_14px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-transform duration-150"
-                >
-                  <div className="aspect-[4/5] w-full overflow-hidden rounded-xl bg-white flex items-center justify-center">
-                    {product.image ? (
-                      <img
-                        src={product.image}
-                        alt=""
-                        className="max-h-full max-w-full object-contain"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    ) : (
-                      <Footprints size={28} className="text-[#ff6e00]" />
-                    )}
-                  </div>
-                  <div className="mt-2.5 text-[13px] font-normal leading-[1.3] text-[#1c1c1c] line-clamp-2">{product.title}</div>
-                  <div className="mt-1.5 text-base font-semibold text-[#1c1c1c]">{product.price}</div>
-                </button>
+                  showFavorite={showHomeProductFavorites}
+                  isFavorite={homeFavoriteIds.has(product.id)}
+                  onToggleFavorite={toggleHomeFavorite}
+                />
               ))}
               <button
                 type="button"
@@ -2025,7 +2717,8 @@ function HomeScreen({ go, setSelectedProduct, setSearchValue, homeProfileCustome
               >
                 Все товары
               </button>
-          </div>
+            </motion.div>
+          </AnimatePresence>
           {isLeshaProfile && (
             <div className="-mx-4 mt-3">
               <div className="flex snap-x snap-proximity gap-3 overflow-x-auto px-4 pb-1 scroll-px-4 [scrollbar-width:none] [-ms-overflow-style:none]">
@@ -2088,7 +2781,7 @@ function CatalogScreen({ go, selectedCategory, setSelectedCategory, searchValue,
   }, [onlyNearby, searchValue, selectedCategory]);
 
   return (
-    <div className="h-full overflow-y-auto pb-24">
+    <div className="h-full overflow-y-auto pb-24 data-scroll-root scroll-pb-24">
       <Header
         title="Каталог"
         subtitle="Поиск, категории и фильтры"
@@ -2380,7 +3073,7 @@ function SizeScreen({ go, setSelectedCategory }) {
   };
 
   return (
-    <div className="h-full overflow-y-auto pb-24">
+    <div className="h-full overflow-y-auto pb-24 data-scroll-root scroll-pb-24">
       <Header title="Подбор размера" subtitle="Быстрый сценарий вместо таблицы" onBack={() => go("home")} />
 
       <div className="px-5 space-y-4">
@@ -2575,7 +3268,7 @@ function ServicesScreen({ go }) {
   ];
 
   return (
-    <div className="h-full overflow-y-auto pb-24 bg-[#f7f8fa]">
+    <div className={cx("h-full overflow-y-auto pb-24 data-scroll-root scroll-pb-24", homeFeedBackgroundClass)}>
       <Header title="Услуги" subtitle="Консультации и медицинский подбор" />
 
       <div className="px-4 space-y-3">
@@ -2598,7 +3291,7 @@ function ServicesScreen({ go }) {
 
 function SalonsScreen() {
   return (
-    <div className="h-full overflow-y-auto pb-24">
+    <div className="h-full overflow-y-auto pb-24 data-scroll-root scroll-pb-24">
       <Header title="Салоны" subtitle="Наличие, примерка и маршрут" />
 
       <div className="px-5 space-y-4">
@@ -2653,7 +3346,7 @@ function SalonsScreen() {
 
 function ProfileScreen({ go }) {
   return (
-    <div className="h-full overflow-y-auto pb-24">
+    <div className="h-full overflow-y-auto pb-24 data-scroll-root scroll-pb-24">
       <Header title="Профиль" subtitle="Бонусы, размеры и повторы" />
 
       <div className="px-5 space-y-4">
@@ -2711,7 +3404,7 @@ function FavoritesScreen({ go, setSelectedProduct }) {
   const favoriteProducts = products.filter((item) => item.rating >= "4.8");
 
   return (
-    <div className="h-full overflow-y-auto pb-24">
+    <div className="h-full overflow-y-auto pb-24 data-scroll-root scroll-pb-24">
       <Header title="Избранное" subtitle="Сохранённые товары и быстрый доступ" />
 
       <div className="px-5 space-y-4">
@@ -2743,7 +3436,7 @@ function CartScreen({ go, cartCount, setCartCount, selectedProduct }) {
 
   if (orderPlaced) {
     return (
-      <div className="h-full overflow-y-auto pb-24">
+      <div className="h-full overflow-y-auto pb-24 data-scroll-root scroll-pb-24">
         <Header title="Заказ оформлен" subtitle="Статус появится на главной" onBack={() => go("home")} />
         <div className="px-5 space-y-4">
           <Card className="p-8 text-center">
@@ -2760,7 +3453,7 @@ function CartScreen({ go, cartCount, setCartCount, selectedProduct }) {
   }
 
   return (
-    <div className="h-full overflow-y-auto pb-24">
+    <div className="h-full overflow-y-auto pb-24 data-scroll-root scroll-pb-24">
       <Header title="Корзина" subtitle="Оформление без лишнего шума" onBack={() => go("product")} />
 
       <div className="px-5 space-y-4">
@@ -2822,7 +3515,7 @@ function OrderScreen({ go }) {
   const filledCells = [0, 1, 3, 4, 6, 8, 12, 16, 18, 20, 21, 23, 24];
 
   return (
-    <div className="h-full overflow-y-auto pb-24">
+    <div className="h-full overflow-y-auto pb-24 data-scroll-root scroll-pb-24">
       <Header title="Заказ" subtitle="Получение в салоне" onBack={() => go("home")} />
 
       <div className="px-5 space-y-4">
@@ -2853,11 +3546,21 @@ function OrderScreen({ go }) {
 export default function OrtekaMobilePrototype() {
   const [screen, setScreen] = useState("home");
   const [homeProfileCustomer, setHomeProfileCustomer] = useState("Катя");
+  const [katyaIsAuthenticated, setKatyaIsAuthenticated] = useState(false);
+  const [katyaAuthPromptDismissed, setKatyaAuthPromptDismissed] = useState(false);
+  const [zhilvinasHeaderGradient, setZhilvinasHeaderGradient] = useState(loadZhilvinasHeaderGradient);
+  const [zhilvinasGradientTunerOpen, setZhilvinasGradientTunerOpen] = useState(true);
 
   useEffect(() => {
     const currentProfile = homeProfileCustomers.find((customer) => customer.name === homeProfileCustomer);
     if (currentProfile?.disabled) {
       setHomeProfileCustomer("Катя");
+    }
+  }, [homeProfileCustomer]);
+
+  useEffect(() => {
+    if (homeProfileCustomer !== "Катя") {
+      setKatyaAuthPromptDismissed(false);
     }
   }, [homeProfileCustomer]);
 
@@ -2968,10 +3671,43 @@ export default function OrtekaMobilePrototype() {
   };
 
   const showBottomNav = !["product", "cart", "order", "size"].includes(screen);
+  const showKatyaAuthPrompt = false;
   const isKatyaHomeScreen = screen === "home" && (isKatyaStyleHomeProfile(homeProfileCustomer) || isZhilvinasStyleHomeProfile(homeProfileCustomer));
+  const showZhilvinasGradientTuner =
+    ZHILVINAS_HEADER_GRADIENT_TUNER_ENABLED &&
+    screen === "home" &&
+    isZhilvinasStyleHomeProfile(homeProfileCustomer);
+
+  useEffect(() => {
+    if (!showZhilvinasGradientTuner) {
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(
+        ZHILVINAS_HEADER_GRADIENT_STORAGE_KEY,
+        JSON.stringify(zhilvinasHeaderGradient)
+      );
+    } catch {
+      // noop
+    }
+  }, [showZhilvinasGradientTuner, zhilvinasHeaderGradient]);
 
   return (
-    <PhoneShell>
+    <PhoneShell
+      katyaAuthPromptVisible={showKatyaAuthPrompt}
+      sidePanel={
+        showZhilvinasGradientTuner ? (
+          <ZhilvinasHeaderGradientTuner
+            open={zhilvinasGradientTunerOpen}
+            onOpenChange={setZhilvinasGradientTunerOpen}
+            value={zhilvinasHeaderGradient}
+            onChange={setZhilvinasHeaderGradient}
+            onReset={() => setZhilvinasHeaderGradient({ ...ZHILVINAS_HEADER_GRADIENT_DEFAULT })}
+          />
+        ) : null
+      }
+    >
       <AnimatePresence mode="wait">
         <motion.div
           key={screen}
@@ -2993,6 +3729,9 @@ export default function OrtekaMobilePrototype() {
               setSearchValue={setSearchValue}
               homeProfileCustomer={homeProfileCustomer}
               setHomeProfileCustomer={setHomeProfileCustomer}
+              zhilvinasHeaderGradient={zhilvinasHeaderGradient}
+              katyaIsAuthenticated={katyaIsAuthenticated}
+              onKatyaAuthorize={() => setKatyaIsAuthenticated(true)}
             />
           )}
 
@@ -3021,10 +3760,22 @@ export default function OrtekaMobilePrototype() {
       </AnimatePresence>
 
       {showBottomNav && (
-        <BottomNav screen={screen} go={go} homeProfileCustomer={homeProfileCustomer} setHomeProfileCustomer={setHomeProfileCustomer} />
+        <BottomNav
+          screen={screen}
+          go={go}
+          homeProfileCustomer={homeProfileCustomer}
+          setHomeProfileCustomer={setHomeProfileCustomer}
+          showKatyaAuthPrompt={showKatyaAuthPrompt}
+          onDismissKatyaAuthPrompt={() => setKatyaAuthPromptDismissed(true)}
+        />
       )}
       {toastMessage && (
-        <div className="absolute bottom-16 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-[#1c1c1c] px-3 py-2 text-xs font-medium text-white shadow-lg">
+        <div
+          className={cx(
+            "absolute left-1/2 z-50 -translate-x-1/2 rounded-lg bg-[#1c1c1c] px-3 py-2 text-xs font-medium text-white shadow-lg",
+            showKatyaAuthPrompt ? "bottom-[7.25rem]" : "bottom-16"
+          )}
+        >
           {toastMessage}
         </div>
       )}
